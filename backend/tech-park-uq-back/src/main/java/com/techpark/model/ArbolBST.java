@@ -1,4 +1,4 @@
-package project_code;
+package com.techpark.model;
 
 public class ArbolBST<T extends Comparable<T>> {
     private NodoArbol<T> raiz;
