@@ -1,4 +1,4 @@
-package main.java.com.techpark.model;
+package main.java.com.techpark.structures;
 
 public class NodoGrafo {
     private String nombre;
