@@ -1,0 +1,10 @@
+git push
+
+git checkout origin main
+
+git pullt pull origin dev-miguel-betancourt
+
+git add .
+
+git push origin main
+
