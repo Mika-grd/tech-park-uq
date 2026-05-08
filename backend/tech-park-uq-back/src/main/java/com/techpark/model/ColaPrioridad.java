@@ -1,4 +1,4 @@
-package com.techpark.model;
+package main.java.com.techpark.model;
 
 public class ColaPrioridad<T> {
     private NodoCola<T> cabeza;

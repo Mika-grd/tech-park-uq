@@ -1,4 +1,4 @@
-package com.techpark.model;
+package main.java.com.techpark.model;
 
 public class Arista {
     private String destino;
