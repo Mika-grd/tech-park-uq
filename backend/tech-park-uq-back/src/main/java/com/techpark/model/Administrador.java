@@ -1,4 +1,4 @@
-package main.java.com.techpark.model;
+package com.techpark.model;
 
 
 public class Administrador {

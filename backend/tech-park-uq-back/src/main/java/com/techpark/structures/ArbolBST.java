@@ -1,4 +1,4 @@
-package main.java.com.techpark.structures;
+package com.techpark.structures;
 public class ArbolBST<T extends Comparable<T>> {
     private NodoArbol<T> raiz;
 

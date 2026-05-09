@@ -1,4 +1,4 @@
-package main.java.com.techpark.structures;
+package com.techpark.structures;
 
 public class NodoLista<T> {
     public T dato;
