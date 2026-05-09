@@ -3,13 +3,14 @@ package com.techpark.controller;
 import com.techpark.model.Atraccion;
 import com.techpark.repository.AtraccionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/atracciones")
-@CrossOrigin(origins = "http://localhost:5173") // Esto es vital para que tu React no de error de CORS
+@CrossOrigin(origins = "http://localhost:5173")
 public class AtraccionController {
 
     @Autowired
@@ -23,5 +24,23 @@ public class AtraccionController {
     @PostMapping
     public Atraccion save(@RequestBody Atraccion atraccion) {
         return repository.save(atraccion);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Atraccion> update(@PathVariable String id, @RequestBody Atraccion atraccion) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        atraccion.setId(id);
+        return ResponseEntity.ok(repository.save(atraccion));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
