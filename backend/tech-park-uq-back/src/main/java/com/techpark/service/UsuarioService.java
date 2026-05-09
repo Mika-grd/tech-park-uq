@@ -1,8 +1,11 @@
 package com.techpark.service;
 
 import com.techpark.dto.LoginRequest;
+import com.techpark.dto.RegisterRequest;
 import com.techpark.dto.UsuarioResponse;
+import com.techpark.exception.EmailAlreadyRegisteredException;
 import com.techpark.model.Usuario;
+import com.techpark.model.Visitante;
 import com.techpark.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,6 +68,54 @@ public class UsuarioService {
             return false;
         }
         return usuarioRepository.existsByEmail(email.trim());
+    }
+
+    /**
+     * Registro público: crea un {@link Visitante}.
+     *
+     * @throws IllegalArgumentException datos inválidos o incompletos
+     * @throws EmailAlreadyRegisteredException si el correo ya está en uso
+     */
+    @Transactional
+    public Usuario register(RegisterRequest request) {
+        if (request == null || request.email() == null || request.password() == null) {
+            throw new IllegalArgumentException("Solicitud inválida");
+        }
+        String email = request.email().trim();
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Correo requerido");
+        }
+        if (emailExists(email)) {
+            throw new EmailAlreadyRegisteredException();
+        }
+        if (request.password().length() < 8) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+        }
+        if (request.nombre() == null || request.nombre().isBlank()) {
+            throw new IllegalArgumentException("Nombre requerido");
+        }
+        if (request.documento() == null || request.documento().isBlank()) {
+            throw new IllegalArgumentException("Documento requerido");
+        }
+        if (request.edad() == null || request.estatura() == null) {
+            throw new IllegalArgumentException("Edad y estatura requeridos");
+        }
+        if (request.edad() < 0 || request.estatura() < 0) {
+            throw new IllegalArgumentException("Edad y estatura deben ser no negativos");
+        }
+
+        Visitante visitante = new Visitante();
+        visitante.setEmail(email);
+        visitante.setPassword(encodePasswordForStorage(request.password()));
+        visitante.setNombre(request.nombre().trim());
+        visitante.setDocumento(request.documento().trim());
+        visitante.setEdad(request.edad());
+        visitante.setEstatura(request.estatura());
+        double saldo = request.saldoVirtual() != null ? request.saldoVirtual() : 0.0;
+        visitante.setSaldoVirtual(saldo);
+        visitante.setActivo(true);
+
+        return usuarioRepository.save(visitante);
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {
