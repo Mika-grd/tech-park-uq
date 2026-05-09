@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Navbar from '../components/Navbar'
 
 interface Props {
   children: ReactNode
@@ -6,8 +7,9 @@ interface Props {
 
 export default function MainLayout({ children }: Props) {
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <Navbar />
       {children}
-    </main>
+    </div>
   )
 }
