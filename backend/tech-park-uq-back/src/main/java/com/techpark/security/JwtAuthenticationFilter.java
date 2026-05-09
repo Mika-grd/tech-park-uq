@@ -3,6 +3,7 @@ package com.techpark.security;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
@@ -19,9 +20,11 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final JwtCookieFactory jwtCookieFactory;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, JwtCookieFactory jwtCookieFactory) {
         this.jwtService = jwtService;
+        this.jwtCookieFactory = jwtCookieFactory;
     }
 
     @Override
@@ -29,13 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        String token = readTokenFromCookie(request);
+        if (token == null || token.isEmpty()) {
+            token = readTokenFromAuthorizationHeader(request);
         }
-        String token = header.substring(7).trim();
-        if (token.isEmpty() || !jwtService.isValid(token)) {
+        if (token == null || token.isEmpty() || !jwtService.isValid(token)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,5 +51,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String readTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        String name = jwtCookieFactory.getCookieName();
+        for (Cookie c : cookies) {
+            if (name.equals(c.getName())) {
+                return c.getValue();
+            }
+        }
+        return null;
+    }
+
+    private static String readTokenFromAuthorizationHeader(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            return null;
+        }
+        return header.substring(7).trim();
     }
 }
