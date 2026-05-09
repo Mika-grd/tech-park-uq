@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+*.mv.db
+*.trace.db
+
+backend/tech-park-uq-back/data/
