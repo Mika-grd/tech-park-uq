@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 const links = [
     { path: '/', label: 'Inicio' },
     { path: '/atracciones', label: 'Atracciones' },
+    { path: '/mapa', label: 'Mapa' },
 ]
 
 export default function Navbar() {
@@ -19,8 +20,8 @@ export default function Navbar() {
                         <Link
                             to={link.path}
                             className={`text-sm tracking-widest uppercase transition ${pathname === link.path
-                                    ? 'text-white font-bold'
-                                    : 'text-zinc-500 hover:text-white'
+                                ? 'text-white font-bold'
+                                : 'text-zinc-500 hover:text-white'
                                 }`}
                         >
                             {link.label}
