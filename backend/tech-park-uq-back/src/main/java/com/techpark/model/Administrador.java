@@ -1,27 +1,22 @@
 package com.techpark.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Administrador {
-    private String id;
-    private String nombre;
-    private String email;
+@Entity
+@Table(name = "administrador")
+@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@Getter
+@Setter
+@NoArgsConstructor
+public class Administrador extends Usuario {
 
-    public Administrador(String id, String nombre, String email) {
-        this.id = id;
-        this.nombre = nombre;
-        this.email = email;
+    @Override
+    public String getRol() {
+        return Rol.Administrador.name();
     }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
 }

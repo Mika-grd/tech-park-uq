@@ -2,7 +2,10 @@ package com.techpark.controller;
 
 import com.techpark.dto.LoginRequest;
 import com.techpark.dto.LoginResponse;
+import com.techpark.dto.RegisterRequest;
 import com.techpark.dto.UsuarioResponse;
+import com.techpark.exception.EmailAlreadyRegisteredException;
+import com.techpark.model.Usuario;
 import com.techpark.security.JwtCookieFactory;
 import com.techpark.security.JwtService;
 import com.techpark.service.UsuarioService;
@@ -35,6 +38,21 @@ public class UsuarioController {
                             .body(new LoginResponse(usuarioService.toUsuarioResponse(usuario)));
                 })
                 .orElseGet(() -> ResponseEntity.status(401).build());
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest body) {
+        try {
+            Usuario usuario = usuarioService.register(body);
+            String token = jwtService.generateToken(usuario);
+            return ResponseEntity.status(201)
+                    .header(HttpHeaders.SET_COOKIE, jwtCookieFactory.createAccessTokenCookie(token).toString())
+                    .body(new LoginResponse(usuarioService.toUsuarioResponse(usuario)));
+        } catch (EmailAlreadyRegisteredException e) {
+            return ResponseEntity.status(409).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/logout")
