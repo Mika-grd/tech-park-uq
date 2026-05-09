@@ -1,32 +1,31 @@
 package com.techpark.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Operador {
-    private String id;
-    private String nombre;
+@Entity
+@Table(name = "operador")
+@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@Getter
+@Setter
+@NoArgsConstructor
+public class Operador extends Usuario {
+
+    @Column(name = "zona_asignada")
     private String zonaAsignada;
 
-    public Operador(String id, String nombre, String zonaAsignada) {
-        this.id = id;
-        this.nombre = nombre;
+    public Operador(String nombre, String zonaAsignada) {
+        setNombre(nombre);
         this.zonaAsignada = zonaAsignada;
     }
 
-    public String getId() {
-        return id;
+    @Override
+    public String getRol() {
+        return Rol.Usuario.name();
     }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getZonaAsignada() {
-        return zonaAsignada;
-    }
-
-    public void setZonaAsignada(String zonaAsignada) {
-        this.zonaAsignada = zonaAsignada;
-    }
-
 }
-

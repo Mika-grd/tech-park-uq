@@ -1,20 +1,48 @@
 package com.techpark.model;
-import com.techpark.structures.*;
+
+import com.techpark.structures.ListaEnlazada;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 
-public class Visitante {
-    private String nombre;
+@Entity
+@Table(name = "visitante")
+@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@Getter
+@Setter
+@NoArgsConstructor
+public class Visitante extends Usuario {
+
+    @Column(nullable = false)
     private String documento;
+
+    @Column(nullable = false)
     private int edad;
+
+    @Column(nullable = false)
     private double estatura;
+
+    @Column(name = "saldo_virtual", nullable = false)
     private double saldoVirtual;
+
+    @Transient
     private Ticket ticket;
-    private ListaEnlazada<String> historialVisitas;
-    private HashSet<String> favoritos;
+
+    @Transient
+    private ListaEnlazada<String> historialVisitas = new ListaEnlazada<>();
+
+    @Transient
+    private HashSet<String> favoritos = new HashSet<>();
 
     public Visitante(String nombre, String documento, int edad, double estatura, double saldoVirtual, Ticket ticket) {
-        this.nombre = nombre;
+        setNombre(nombre);
         this.documento = documento;
         this.edad = edad;
         this.estatura = estatura;
@@ -24,40 +52,8 @@ public class Visitante {
         this.favoritos = new HashSet<>();
     }
 
-    public String getNombre() {
-        return nombre;
+    @Override
+    public String getRol() {
+        return Rol.Visitante.name();
     }
-
-    public String getDocumento() {
-        return documento;
-    }
-
-    public int getEdad() {
-        return edad;
-    }
-
-    public double getEstatura() {
-        return estatura;
-    }
-
-    public double getSaldoVirtual() {
-        return saldoVirtual;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public ListaEnlazada<String> getHistorialVisitas() {
-        return historialVisitas;
-    }
-
-    public HashSet<String> getFavoritos() {
-        return favoritos;
-    }
-
-    public void setSaldoVirtual(double saldoVirtual) {
-        this.saldoVirtual = saldoVirtual;
-    }
-
 }
