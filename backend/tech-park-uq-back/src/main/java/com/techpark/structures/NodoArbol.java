@@ -1,4 +1,4 @@
-package com.techpark.model;
+package com.techpark.structures;
 
 public class NodoArbol<T> {
     public T dato;

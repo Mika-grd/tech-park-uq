@@ -16,3 +16,5 @@ build/
 .settings/
 .project/
 .classpath
+
+backend/tech-park-uq-back/data/

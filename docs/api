@@ -1,0 +1,74 @@
+# API Documentation - Tech Park Project
+
+Este documento detalla los puntos de acceso (endpoints) disponibles en la API del sistema de gestion del parque tematico. La API esta construida sobre Spring Boot y utiliza el formato JSON para el intercambio de informacion.
+
+## Informacion General
+
+- URL Base: http://localhost:8080/api
+- Formato de Datos: Application/JSON
+- Persistencia: Motor H2 (Modo Archivo)
+
+## Endpoints de Atracciones
+
+### 1. Obtener Lista Completa
+Recupera todas las atracciones almacenadas en la base de datos persistente.
+
+- Metodo: GET
+- Ruta: /atracciones
+- Descripcion: Retorna un arreglo de objetos que representan las atracciones mecánicas, acuáticas y demas categorías del parque.
+
+Ejemplo de Respuesta (200 OK):
+[
+  {
+    "id": "ATR-001",
+    "nombre": "Thunder Mountain",
+    "tipo": "MECANICA_ALTURA",
+    "capacidadMaxima": 30,
+    "alturaMinima": 1.40,
+    "edadMinima": 12,
+    "costoAdicional": 5000.0,
+    "tiempoEspera": 15,
+    "estado": "ACTIVA",
+    "visitantesAcumulados": 0
+  }
+]
+
+### 2. Registrar Nueva Atraccion
+Crea un nuevo registro de atraccion en el sistema.
+
+- Metodo: POST
+- Ruta: /atracciones
+- Descripcion: Recibe un objeto JSON con los detalles de la atraccion y lo almacena de forma permanente.
+
+Cuerpo de la Peticion (Request Body):
+{
+  "id": "ATR-002",
+  "nombre": "Splash River",
+  "tipo": "ACUATICA",
+  "capacidadMaxima": 15,
+  "alturaMinima": 1.10,
+  "edadMinima": 8,
+  "costoAdicional": 2000.0,
+  "tiempoEspera": 5,
+  "estado": "ACTIVA",
+  "visitantesAcumulados": 0
+}
+
+---
+
+## Herramientas de Desarrollo y Debugging
+
+### Consola de Base de Datos H2
+Para realizar consultas SQL directas o verificar la integridad de las tablas fisicas.
+
+- URL: http://localhost:8080/h2-console
+- JDBC URL: jdbc:h2:file:./data/techpark_db
+- User Name: sa
+- Password: password
+
+### Codigos de Estado HTTP
+- 200 OK: Solicitud procesada correctamente.
+- 201 Created: El recurso se ha creado exitosamente.
+- 400 Bad Request: Error en la estructura del JSON enviado.
+- 404 Not Found: El recurso o endpoint no existe.
+- 500 Internal Server Error: Error inesperado en la logica del servidor.

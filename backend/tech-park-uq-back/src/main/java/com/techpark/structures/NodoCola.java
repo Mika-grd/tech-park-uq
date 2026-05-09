@@ -1,4 +1,4 @@
-package main.java.com.techpark.model;
+package com.techpark.structures;
 
 public class NodoCola<T> {
     public T dato;
