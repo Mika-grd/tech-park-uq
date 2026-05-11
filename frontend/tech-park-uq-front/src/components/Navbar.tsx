@@ -42,7 +42,9 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
                 {usuario ? (
                     <>
-                        <span className="text-zinc-400 text-sm">{usuario.nombre}</span>
+                        <Link to="/perfil" className="text-zinc-400 text-sm hover:text-white transition">
+                            {usuario.nombre}
+                        </Link>
                         <button
                             onClick={handleLogout}
                             className="text-sm text-red-400 hover:text-red-300 transition uppercase tracking-widest"

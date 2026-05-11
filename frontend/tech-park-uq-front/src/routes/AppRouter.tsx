@@ -5,6 +5,7 @@ import MapaPage from '../pages/MapaPage'
 import ZonasPage from '../pages/ZonasPage'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
+import PerfilPage from '../pages/PerfilPage'
 
 export default function AppRouter() {
   return (
@@ -16,6 +17,7 @@ export default function AppRouter() {
         <Route path="/zonas" element={<ZonasPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/perfil" element={<PerfilPage />} />
       </Routes>
     </BrowserRouter>
   )
