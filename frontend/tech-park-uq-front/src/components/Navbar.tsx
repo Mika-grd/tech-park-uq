@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const links = [
     { path: '/', label: 'Inicio' },
@@ -9,12 +10,19 @@ const links = [
 
 export default function Navbar() {
     const { pathname } = useLocation()
+    const { usuario, logout } = useAuth()
+    const navigate = useNavigate()
+
+    const handleLogout = () => {
+        logout().then(() => navigate('/login'))
+    }
 
     return (
         <nav className="bg-zinc-950 border-b border-zinc-800 px-8 py-4 flex items-center justify-between">
             <span className="font-['Metal_Mania'] text-xl text-white tracking-widest">
                 TECH-PARK-UQ
             </span>
+
             <ul className="flex gap-6">
                 {links.map(link => (
                     <li key={link.path}>
@@ -30,6 +38,27 @@ export default function Navbar() {
                     </li>
                 ))}
             </ul>
+
+            <div className="flex items-center gap-4">
+                {usuario ? (
+                    <>
+                        <span className="text-zinc-400 text-sm">{usuario.nombre}</span>
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm text-red-400 hover:text-red-300 transition uppercase tracking-widest"
+                        >
+                            Salir
+                        </button>
+                    </>
+                ) : (
+                    <Link
+                        to="/login"
+                        className="text-sm text-zinc-500 hover:text-white transition uppercase tracking-widest"
+                    >
+                        Iniciar sesión
+                    </Link>
+                )}
+            </div>
         </nav>
     )
 }
