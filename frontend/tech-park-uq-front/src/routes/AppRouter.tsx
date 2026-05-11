@@ -7,6 +7,7 @@ import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import PerfilPage from '../pages/PerfilPage'
 import ProtectedRoute from './ProtectedRoute'
+import EstadisticasPage from '../pages/EstadisticasPage'
 
 export default function AppRouter() {
   return (
@@ -19,6 +20,7 @@ export default function AppRouter() {
         <Route path="/zonas" element={<ProtectedRoute><ZonasPage /></ProtectedRoute>} />
         <Route path="/mapa" element={<ProtectedRoute><MapaPage /></ProtectedRoute>} />
         <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
+        <Route path="/estadisticas" element={<ProtectedRoute><EstadisticasPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

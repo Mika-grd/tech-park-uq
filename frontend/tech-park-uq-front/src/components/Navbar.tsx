@@ -6,6 +6,7 @@ const links = [
     { path: '/atracciones', label: 'Atracciones' },
     { path: '/zonas', label: 'Zonas' },
     { path: '/mapa', label: 'Mapa' },
+    { path: '/estadisticas', label: 'Estadísticas' },
 ]
 
 export default function Navbar() {
