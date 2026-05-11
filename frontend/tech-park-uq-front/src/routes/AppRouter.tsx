@@ -6,18 +6,19 @@ import ZonasPage from '../pages/ZonasPage'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import PerfilPage from '../pages/PerfilPage'
+import ProtectedRoute from './ProtectedRoute'
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/atracciones" element={<AtraccionesPage />} />
-        <Route path="/mapa" element={<MapaPage />} />
-        <Route path="/zonas" element={<ZonasPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/perfil" element={<PerfilPage />} />
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/atracciones" element={<ProtectedRoute><AtraccionesPage /></ProtectedRoute>} />
+        <Route path="/zonas" element={<ProtectedRoute><ZonasPage /></ProtectedRoute>} />
+        <Route path="/mapa" element={<ProtectedRoute><MapaPage /></ProtectedRoute>} />
+        <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
