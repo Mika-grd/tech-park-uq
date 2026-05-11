@@ -38,13 +38,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                        "/api/usuarios/login",
-                                        "/api/usuarios/logout",
-                                        "/api/usuarios/register",
-                                        "/api/usuarios/existe-email")
-                                .permitAll()
+                                "/api/usuarios/login",
+                                "/api/usuarios/logout",
+                                "/api/usuarios/register",
+                                "/api/usuarios/existe-email")
+                        .permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/atracciones/**").permitAll()
+                        .requestMatchers("/api/zonas/**").permitAll()
                         .anyRequest().authenticated())
                 .headers(h -> h.frameOptions(frame -> frame.sameOrigin()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

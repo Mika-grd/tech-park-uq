@@ -22,14 +22,22 @@ public class ZonaController {
     }
 
     @PostMapping
-    public Zona save(@RequestBody Zona zona) {
-        return repository.save(zona);
+    public ResponseEntity<?> save(@RequestBody Zona zona) {
+        if (zona.getVisitantesActuales() > zona.getCapacidadMaxima()) {
+            return ResponseEntity.badRequest()
+                .body("Los visitantes actuales no pueden superar la capacidad máxima");
+        }
+        return ResponseEntity.ok(repository.save(zona));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Zona> update(@PathVariable String id, @RequestBody Zona zona) {
+    public ResponseEntity<?> update(@PathVariable String id, @RequestBody Zona zona) {
         if (!repository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }
+        if (zona.getVisitantesActuales() > zona.getCapacidadMaxima()) {
+            return ResponseEntity.badRequest()
+                .body("Los visitantes actuales no pueden superar la capacidad máxima");
         }
         zona.setId(id);
         return ResponseEntity.ok(repository.save(zona));
@@ -44,3 +52,10 @@ public class ZonaController {
         return ResponseEntity.noContent().build();
     }
 }
+                    
+
+    
+        
+    
+
+    
