@@ -99,7 +99,7 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
         return usuarioService
                 .findById(id)
