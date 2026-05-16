@@ -11,6 +11,8 @@ export default function HomePage() {
   const [atracciones, setAtracciones] = useState<Atraccion[]>([])
   const [seeding, setSeeding] = useState(false)
   const [seedMsg, setSeedMsg] = useState<string | null>(null)
+  const [clearing, setClearing] = useState(false)
+  const [clearMsg, setClearMsg] = useState<string | null>(null)
 
   const loadAtracciones = () =>
     api.get('/atracciones')
@@ -33,6 +35,24 @@ export default function HomePage() {
       setSeedMsg(`Error: ${e?.response?.status ?? ''} ${e?.response?.data?.message ?? JSON.stringify(e?.response?.data) ?? ''}`)
     } finally {
       setSeeding(false)
+    }
+  }
+
+  async function handleClearDb() {
+    const ok = window.confirm('Esto borrará TODAS las tablas (zonas, atracciones, usuarios). ¿Seguro?')
+    if (!ok) return
+
+    setClearMsg(null)
+    setClearing(true)
+    try {
+      const res = await api.post('/dev/clear')
+      setClearMsg(`DB limpia: zonas=${res.data?.zonaCount ?? 0}, atracciones=${res.data?.atraccionCount ?? 0}, usuarios=${res.data?.usuarioCount ?? 0}`)
+      loadAtracciones()
+    } catch (e: any) {
+      console.error('Error limpiando DB', e)
+      setClearMsg(`Error: ${e?.response?.status ?? ''} ${e?.response?.data?.message ?? JSON.stringify(e?.response?.data) ?? ''}`)
+    } finally {
+      setClearing(false)
     }
   }
 
@@ -71,6 +91,18 @@ export default function HomePage() {
               </button>
               {seedMsg && (
                 <p className="text-xs text-zinc-400 max-w-xl break-words">{seedMsg}</p>
+              )}
+
+              <button
+                onClick={handleClearDb}
+                disabled={clearing}
+                className="px-6 py-3 rounded-lg border border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-950/70 transition tracking-widest text-xs uppercase disabled:opacity-50"
+                title="Borra todas las tablas (solo dev)"
+              >
+                {clearing ? 'Limpiando…' : 'Clear DB (dev)'}
+              </button>
+              {clearMsg && (
+                <p className="text-xs text-zinc-400 max-w-xl break-words">{clearMsg}</p>
               )}
             </div>
           </div>
