@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import com.techpark.service.FavoritosService;
+import com.techpark.service.HistorialService;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -31,6 +32,9 @@ public class UsuarioController {
 
     @Autowired
     private FavoritosService favoritosService;
+
+    @Autowired
+    private HistorialService historialService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest body) {
@@ -156,4 +160,22 @@ public class UsuarioController {
         }
         return null;
     }
+
+    @GetMapping("/historial")
+    public ResponseEntity<?> getHistorial(HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(historialService.listar(userId));
+    }
+
+    @PostMapping("/historial/{atraccionId}")
+    public ResponseEntity<?> registrarVisita(@PathVariable String atraccionId, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        historialService.registrar(userId, atraccionId);
+        return ResponseEntity.ok(historialService.listar(userId));
+    }
+
 }

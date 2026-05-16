@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { addSaldo, getUsuarioByEmail } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 import { getFavoritos, removeFavorito } from '../services/favoritosService'
+import { getHistorial } from '../services/historialService'
 
 
 interface PerfilData {
@@ -28,6 +29,14 @@ export default function PerfilPage() {
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [successMsg, setSuccessMsg] = useState<string | null>(null)
     const [favoritos, setFavoritos] = useState<string[]>([])
+
+    const [historial, setHistorial] = useState<string[]>([])
+
+    useEffect(() => {
+        getHistorial()
+            .then(setHistorial)
+            .catch(() => { })
+    }, [])
 
     useEffect(() => {
         getFavoritos()
@@ -213,6 +222,21 @@ export default function PerfilPage() {
                             </div>
                         </div>
                     )}
+                    {/* Historial */}
+                    {historial.length > 0 && (
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Historial de Visitas</p>
+                            <div className="flex flex-col gap-2">
+                                {historial.map((id, index) => (
+                                    <div key={index} className="flex items-center gap-3 bg-zinc-800 rounded-lg px-3 py-2">
+                                        <span className="text-zinc-500 text-xs w-5">{index + 1}</span>
+                                        <span className="text-sm text-zinc-300">{id}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </MainLayout>

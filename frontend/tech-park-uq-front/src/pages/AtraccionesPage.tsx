@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../services/api'
 import MainLayout from '../layouts/MainLayout'
 import { getFavoritos, addFavorito, removeFavorito } from '../services/favoritosService'
+import { registrarVisita } from '../services/historialService'
 
 interface Atraccion {
     id: string
@@ -55,6 +56,10 @@ export default function AtraccionesPage() {
             const updated = await addFavorito(id)
             setFavoritos(updated)
         }
+    }
+
+    const handleVisitar = async (id: string) => {
+        await registrarVisita(id)
     }
 
     const cargarAtracciones = () => {
@@ -168,11 +173,10 @@ export default function AtraccionesPage() {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => toggleFavorito(a.id)}
-                                        className={`flex-1 text-sm py-1.5 rounded-lg border transition ${
-                                            favoritos.includes(a.id)
-                                                ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-950'
-                                                : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'
-                                        }`}
+                                        className={`flex-1 text-sm py-1.5 rounded-lg border transition ${favoritos.includes(a.id)
+                                            ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-950'
+                                            : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'
+                                            }`}
                                     >
                                         {favoritos.includes(a.id) ? '★ Favorito' : '☆ Favorito'}
                                     </button>
@@ -187,6 +191,12 @@ export default function AtraccionesPage() {
                                         className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition"
                                     >
                                         Eliminar
+                                    </button>
+                                    <button
+                                        onClick={() => handleVisitar(a.id)}
+                                        className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
+                                    >
+                                        Visitar
                                     </button>
                                 </div>
                             </div>
