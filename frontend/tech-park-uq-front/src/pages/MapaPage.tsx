@@ -10,11 +10,17 @@ interface Atraccion {
     tipo: string
 }
 
+interface Zona {
+    id: string
+    nombre: string
+}
+
 interface Nodo extends d3.SimulationNodeDatum {
     id: string
     nombre: string
     estado: 'ACTIVA' | 'EN_MANTENIMIENTO' | 'CERRADA'
     tipo: string
+    zonaId: string
 }
 
 interface Arista {
@@ -25,37 +31,125 @@ interface Arista {
 export default function MapaPage() {
     const svgRef = useRef<SVGSVGElement>(null)
     const [atracciones, setAtracciones] = useState<Atraccion[]>([])
+    const [zonas, setZonas] = useState<Zona[]>([])
 
     useEffect(() => {
         api.get('/atracciones')
             .then(res => setAtracciones(Array.isArray(res.data) ? res.data : []))
             .catch(err => console.error(err))
+
+        api.get('/zonas')
+            .then(res => setZonas(Array.isArray(res.data) ? res.data : []))
+            .catch(err => console.error(err))
     }, [])
 
     useEffect(() => {
-        if (!atracciones.length || !svgRef.current) return
+    if (!atracciones.length || !svgRef.current) return
 
-        const width = svgRef.current.clientWidth
-        const height = svgRef.current.clientHeight
+    const width = svgRef.current.clientWidth
+    const height = svgRef.current.clientHeight
 
         d3.select(svgRef.current).selectAll('*').remove()
 
-        const nodos: Nodo[] = atracciones.map(a => ({ ...a }))
+        const zonasSafe: Zona[] = zonas.length
+            ? zonas
+            : [{ id: 'Z-01', nombre: 'Zona A' }, { id: 'Z-02', nombre: 'Zona B' }, { id: 'Z-03', nombre: 'Zona C' }]
 
-        // Generar conexiones automáticas entre nodos consecutivos
-        const aristas: Arista[] = nodos.slice(0, -1).map((n, i) => ({
-            source: n.id,
-            target: nodos[i + 1].id
-        }))
+        const zoneIds = zonasSafe.map(z => z.id)
+
+        // Asignar atracciones a zonas (determinístico por id)
+        const nodos: Nodo[] = atracciones.map((a, idx) => {
+            const n = Number.parseInt(String(a.id).replace(/\D/g, ''), 10)
+            const pick = Number.isFinite(n) ? n : idx
+            const zonaId = zoneIds[pick % zoneIds.length]
+            return { ...a, zonaId }
+        })
+
+        // Conexiones:
+        // - Dentro de cada zona: chain simple (A -> B -> C ...)
+        // - Entre zonas: puentes entre “nodos representativos”
+        const nodosPorZona = d3.group(nodos, d => d.zonaId)
+        const aristas: Arista[] = []
+
+        for (const [, group] of nodosPorZona) {
+            // Orden determinístico para que el grafo sea estable
+            const ordered = [...group].sort((a, b) => String(a.id).localeCompare(String(b.id)))
+            for (let i = 0; i < ordered.length - 1; i++) {
+                aristas.push({ source: ordered[i].id, target: ordered[i + 1].id })
+            }
+        }
+
+        // Puentes entre zonas (cadena simple en el orden de zoneIds)
+        // Elegimos el primer nodo de cada zona (por id) como representante.
+        const reps: string[] = zoneIds
+            .map(zid => {
+                const group = nodosPorZona.get(zid) ?? []
+                const ordered = [...group].sort((a, b) => String(a.id).localeCompare(String(b.id)))
+                return ordered[0]?.id
+            })
+            .filter(Boolean) as string[]
+
+        for (let i = 0; i < reps.length - 1; i++) {
+            aristas.push({ source: reps[i], target: reps[i + 1] })
+        }
 
         const svg = d3.select(svgRef.current)
             .attr('width', width)
             .attr('height', height)
 
+        // Root group para zoom/pan
+        const root = svg.append('g').attr('class', 'root')
+
+        // Zoom
+        const zoom = d3.zoom<SVGSVGElement, unknown>()
+            .scaleExtent([0.4, 3])
+            .on('zoom', (event) => {
+                root.attr('transform', event.transform)
+            })
+
+        svg.call(zoom as any)
+        // doble click para reset
+        svg.on('dblclick.zoom', null)
+        svg.on('dblclick', () => {
+            svg.transition().duration(250).call(zoom.transform as any, d3.zoomIdentity)
+        })
+
+        // Centros fijos por zona para formar conglomerados
+        const zoneCenters = new Map<string, { x: number, y: number }>()
+        const cols = Math.ceil(Math.sqrt(zoneIds.length))
+        const pad = 220
+        zoneIds.forEach((zid, i) => {
+            const col = i % cols
+            const row = Math.floor(i / cols)
+            zoneCenters.set(zid, {
+                x: pad + col * ((width - pad * 2) / Math.max(1, cols - 1 || 1)),
+                y: pad + row * ((height - pad * 2) / Math.max(1, Math.ceil(zoneIds.length / cols) - 1 || 1)),
+            })
+        })
+
         const sim = d3.forceSimulation(nodos)
-            .force('link', d3.forceLink(aristas).id((d: any) => d.id).distance(160))
-            .force('charge', d3.forceManyBody().strength(-400))
-            .force('center', d3.forceCenter(width / 2, height / 2))
+            .force(
+                'link',
+                d3
+                    .forceLink<Nodo, any>(aristas)
+                    .id((d: any) => d.id)
+                    .distance((l: any) => {
+                        // si es puente entre zonas, más largo
+                        const a = nodos.find(n => n.id === l.source.id)?.zonaId
+                        const b = nodos.find(n => n.id === l.target.id)?.zonaId
+                        return a && b && a !== b ? 260 : 130
+                    })
+                    .strength((l: any) => {
+                        const a = nodos.find(n => n.id === l.source.id)?.zonaId
+                        const b = nodos.find(n => n.id === l.target.id)?.zonaId
+                        return a && b && a !== b ? 0.08 : 0.12
+                    })
+            )
+            .force('charge', d3.forceManyBody().strength(-420))
+            .force('collide', d3.forceCollide<d3.SimulationNodeDatum>(64).strength(1))
+            .force('x', d3.forceX<Nodo>(d => zoneCenters.get(d.zonaId)?.x ?? width / 2).strength(0.55))
+            .force('y', d3.forceY<Nodo>(d => zoneCenters.get(d.zonaId)?.y ?? height / 2).strength(0.55))
+            .alphaDecay(0.06)
 
         const colorNodo = (estado: string) => {
             if (estado === 'ACTIVA') return '#22c55e'
@@ -63,16 +157,45 @@ export default function MapaPage() {
             return '#ef4444'
         }
 
+        const zoneColor = d3.scaleOrdinal<string, string>()
+            .domain(zoneIds)
+            .range(['#60a5fa', '#f472b6', '#34d399', '#fbbf24', '#a78bfa', '#fb7185', '#22d3ee', '#c084fc'])
+
+        // Fondos por zona (cajas suaves)
+        const zoneLayer = root.append('g').attr('class', 'zones')
+        const zoneBoxes = zoneLayer.selectAll('g')
+            .data(zonasSafe)
+            .enter()
+            .append('g')
+
+        zoneBoxes.append('rect')
+            .attr('rx', 24)
+            .attr('ry', 24)
+            .attr('fill', d => zoneColor(d.id))
+            .attr('opacity', 0.10)
+            .attr('stroke', d => zoneColor(d.id))
+            .attr('stroke-opacity', 0.35)
+            .attr('stroke-width', 2)
+
+        zoneBoxes.append('text')
+            .text(d => d.nombre)
+            .attr('fill', '#e4e4e7')
+            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-size', 12)
+            .attr('font-weight', 700)
+            .attr('opacity', 0.85)
+
         // Aristas
-        const link = svg.append('g')
+        const link = root.append('g')
             .selectAll('line')
             .data(aristas)
             .enter().append('line')
             .attr('stroke', '#3f3f46')
             .attr('stroke-width', 2)
+            .attr('opacity', 0.45)
 
         // Nodos
-        const node = svg.append('g')
+    const node = root.append('g')
             .selectAll('g')
             .data(nodos)
             .enter().append('g')
@@ -93,6 +216,9 @@ export default function MapaPage() {
             .attr('r', 28)
             .attr('fill', d => colorNodo(d.estado))
             .attr('opacity', 0.9)
+            .attr('stroke', d => zoneColor(d.zonaId))
+            .attr('stroke-width', 3)
+            .attr('stroke-opacity', 0.65)
 
         node.append('text')
             .text(d => d.nombre.length > 12 ? d.nombre.slice(0, 12) + '…' : d.nombre)
@@ -109,11 +235,36 @@ export default function MapaPage() {
             .attr('font-size', '16px')
 
         sim.on('tick', () => {
+            // Actualizar cajas por zona tomando el bounding box de sus nodos
+            for (const z of zonasSafe) {
+                const nodesForZone = nodos.filter(n => n.zonaId === z.id && Number.isFinite(n.x as any) && Number.isFinite(n.y as any))
+                const center = zoneCenters.get(z.id) ?? { x: width / 2, y: height / 2 }
+                const padding = 80
+                let minX = center.x - 160, maxX = center.x + 160, minY = center.y - 120, maxY = center.y + 120
+                if (nodesForZone.length) {
+                    minX = d3.min(nodesForZone, n => n.x as number) ?? minX
+                    maxX = d3.max(nodesForZone, n => n.x as number) ?? maxX
+                    minY = d3.min(nodesForZone, n => n.y as number) ?? minY
+                    maxY = d3.max(nodesForZone, n => n.y as number) ?? maxY
+                }
+
+                const g = zoneBoxes.filter(d => d.id === z.id)
+                g.select('rect')
+                    .attr('x', minX - padding)
+                    .attr('y', minY - padding)
+                    .attr('width', (maxX - minX) + padding * 2)
+                    .attr('height', (maxY - minY) + padding * 2)
+
+                g.select('text')
+                    .attr('x', (minX - padding) + 16)
+                    .attr('y', (minY - padding) + 28)
+            }
+
             link
-                .attr('x1', (d: any) => d.source.x)
-                .attr('y1', (d: any) => d.source.y)
-                .attr('x2', (d: any) => d.target.x)
-                .attr('y2', (d: any) => d.target.y)
+                .attr('x1', (d: any) => (d.source.x ?? 0))
+                .attr('y1', (d: any) => (d.source.y ?? 0))
+                .attr('x2', (d: any) => (d.target.x ?? 0))
+                .attr('y2', (d: any) => (d.target.y ?? 0))
 
             node.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
         })
@@ -148,9 +299,13 @@ export default function MapaPage() {
                 </div>
 
                 {/* Grafo */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden" style={{ height: '500px' }}>
+                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden" style={{ height: '680px' }}>
                     <svg ref={svgRef} className="w-full h-full" />
                 </div>
+
+                <p className="text-xs text-zinc-500 mt-3 tracking-widest uppercase">
+                    Tip: rueda del mouse para zoom • arrastra para mover • doble click para reset
+                </p>
 
                 {/* Lista */}
                 <div className="mt-6 flex flex-wrap gap-3">

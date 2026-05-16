@@ -61,11 +61,33 @@ public class DevSeedController {
         return ResponseEntity.ok(out);
     }
 
+    /**
+     * Limpia tablas principales (solo para desarrollo).
+     *
+     * Nota: borra TODO. Úsalo con cuidado.
+     */
+    @PostMapping("/clear")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> clearDb() {
+        // Orden: primero entidades que dependen de otras.
+        // En este proyecto las relaciones son mínimas, pero mantenemos un orden seguro.
+        atraccionRepository.deleteAll();
+        zonaRepository.deleteAll();
+        usuarioRepository.deleteAll();
+
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("message", "DB cleared");
+        out.put("zonaCount", zonaRepository.count());
+        out.put("atraccionCount", atraccionRepository.count());
+        out.put("usuarioCount", usuarioRepository.count());
+        return ResponseEntity.ok(out);
+    }
+
     private int seedZonas() {
         int created = 0;
-        for (int i = 1; i <= 20; i++) {
+    for (int i = 1; i <= 5; i++) {
             String id = String.format("Z-%02d", i);
-            if (zonaRepository.findById(id).isPresent()) continue;
+            if (zonaRepository.existsById(id)) continue;
             String nombre;
             if (i % 3 == 1) nombre = "Zona Mecánica " + i;
             else if (i % 3 == 2) nombre = "Zona Acuática " + i;
@@ -81,7 +103,7 @@ public class DevSeedController {
         int created = 0;
     for (int i = 1; i <= 20; i++) {
         String id = String.format("A-%02d", i);
-        if (atraccionRepository.findById(id).isPresent()) continue;
+    if (atraccionRepository.existsById(id)) continue;
 
         Atraccion.Tipo tipo = (i % 3 == 0)
             ? Atraccion.Tipo.ACUATICA
@@ -130,7 +152,10 @@ public class DevSeedController {
 
         // Operadores
         created += seedOperador("op1@techpark.com", "Operador 1", "op123456", "Z-01");
-        created += seedOperador("op2@techpark.com", "Operador 2", "op123456", "Z-02");
+    created += seedOperador("op2@techpark.com", "Operador 2", "op123456", "Z-02");
+    created += seedOperador("op3@techpark.com", "Operador 3", "op123456", "Z-03");
+    created += seedOperador("op4@techpark.com", "Operador 4", "op123456", "Z-04");
+    created += seedOperador("op5@techpark.com", "Operador 5", "op123456", "Z-05");
 
     // Visitantes (>=20)
     created += seedVisitantes(20);
