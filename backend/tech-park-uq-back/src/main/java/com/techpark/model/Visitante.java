@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
+import com.techpark.structures.ConjuntoSet;
 
 @Entity
 @Table(name = "visitante")
@@ -39,7 +39,7 @@ public class Visitante extends Usuario {
     private ListaEnlazada<String> historialVisitas = new ListaEnlazada<>();
 
     @Transient
-    private HashSet<String> favoritos = new HashSet<>();
+    private ConjuntoSet<String> favoritos = new ConjuntoSet<>();
 
     public Visitante(String nombre, String documento, int edad, double estatura, double saldoVirtual, Ticket ticket) {
         setNombre(nombre);
@@ -49,7 +49,7 @@ public class Visitante extends Usuario {
         this.saldoVirtual = saldoVirtual;
         this.ticket = ticket;
         this.historialVisitas = new ListaEnlazada<>();
-        this.favoritos = new HashSet<>();
+        this.favoritos = new ConjuntoSet<>();
     }
 
     @Override

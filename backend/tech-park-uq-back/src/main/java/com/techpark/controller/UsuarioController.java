@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
+import com.techpark.service.FavoritosService;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -27,6 +28,9 @@ public class UsuarioController {
 
     @Autowired
     private JwtCookieFactory jwtCookieFactory;
+
+    @Autowired
+    private FavoritosService favoritosService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest body) {
@@ -65,7 +69,7 @@ public class UsuarioController {
 
     @PostMapping("/saldo")
     public ResponseEntity<?> adjustSaldo(@RequestBody com.techpark.dto.AdjustSaldoRequest body,
-                                                       HttpServletRequest request) {
+            HttpServletRequest request) {
         String cookieName = jwtCookieFactory.getCookieName();
         String token = null;
         if (request.getCookies() != null) {
@@ -110,5 +114,46 @@ public class UsuarioController {
     @GetMapping("/existe-email")
     public ResponseEntity<Boolean> existsEmail(@RequestParam String email) {
         return ResponseEntity.ok(usuarioService.emailExists(email));
+    }
+
+    @GetMapping("/favoritos")
+    public ResponseEntity<?> getFavoritos(HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(favoritosService.listar(userId));
+    }
+
+    @PostMapping("/favoritos/{atraccionId}")
+    public ResponseEntity<?> addFavorito(@PathVariable String atraccionId, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        favoritosService.agregar(userId, atraccionId);
+        return ResponseEntity.ok(favoritosService.listar(userId));
+    }
+
+    @DeleteMapping("/favoritos/{atraccionId}")
+    public ResponseEntity<?> removeFavorito(@PathVariable String atraccionId, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        favoritosService.eliminar(userId, atraccionId);
+        return ResponseEntity.ok(favoritosService.listar(userId));
+    }
+
+    private Long extractUserId(HttpServletRequest request) {
+        String cookieName = jwtCookieFactory.getCookieName();
+        if (request.getCookies() == null)
+            return null;
+        for (jakarta.servlet.http.Cookie c : request.getCookies()) {
+            if (cookieName.equals(c.getName())) {
+                String token = c.getValue();
+                if (!jwtService.isValid(token))
+                    return null;
+                return Long.parseLong(jwtService.parseClaims(token).getSubject());
+            }
+        }
+        return null;
     }
 }
