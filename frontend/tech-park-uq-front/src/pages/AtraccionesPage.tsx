@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../services/api'
 import MainLayout from '../layouts/MainLayout'
+import { getFavoritos, addFavorito, removeFavorito } from '../services/favoritosService'
+import { registrarVisita } from '../services/historialService'
 
 interface Atraccion {
     id: string
@@ -37,6 +39,28 @@ export default function AtraccionesPage() {
     const [editando, setEditando] = useState(false)
     const [form, setForm] = useState(estadoInicial)
     const [guardando, setGuardando] = useState(false)
+
+    const [favoritos, setFavoritos] = useState<string[]>([])
+
+    useEffect(() => {
+        getFavoritos()
+            .then(setFavoritos)
+            .catch(() => { })
+    }, [])
+
+    const toggleFavorito = async (id: string) => {
+        if (favoritos.includes(id)) {
+            const updated = await removeFavorito(id)
+            setFavoritos(updated)
+        } else {
+            const updated = await addFavorito(id)
+            setFavoritos(updated)
+        }
+    }
+
+    const handleVisitar = async (id: string) => {
+        await registrarVisita(id)
+    }
 
     const cargarAtracciones = () => {
         setLoading(true)
@@ -109,6 +133,7 @@ export default function AtraccionesPage() {
             .catch(err => console.error(err))
     }
 
+
     return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen p-8">
@@ -147,6 +172,15 @@ export default function AtraccionesPage() {
                                 <p className="text-zinc-400 text-sm mb-4">⏱ Espera: {a.tiempoEspera} min</p>
                                 <div className="flex gap-2">
                                     <button
+                                        onClick={() => toggleFavorito(a.id)}
+                                        className={`flex-1 text-sm py-1.5 rounded-lg border transition ${favoritos.includes(a.id)
+                                            ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-950'
+                                            : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'
+                                            }`}
+                                    >
+                                        {favoritos.includes(a.id) ? '★ Favorito' : '☆ Favorito'}
+                                    </button>
+                                    <button
                                         onClick={() => abrirEditar(a)}
                                         className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition"
                                     >
@@ -157,6 +191,12 @@ export default function AtraccionesPage() {
                                         className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition"
                                     >
                                         Eliminar
+                                    </button>
+                                    <button
+                                        onClick={() => handleVisitar(a.id)}
+                                        className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
+                                    >
+                                        Visitar
                                     </button>
                                 </div>
                             </div>

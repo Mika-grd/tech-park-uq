@@ -45,6 +45,8 @@ public class SecurityConfig {
                                         "/api/usuarios/saldo")
                         .permitAll()
                         .requestMatchers("/api/dev/**").permitAll()
+                        .requestMatchers("/api/usuarios/**").permitAll()
+                        .requestMatchers("/api/visitante/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/atracciones/**").permitAll()
                         .requestMatchers("/api/zonas/**").permitAll()

@@ -3,6 +3,9 @@ import MainLayout from '../layouts/MainLayout'
 import { useAuth } from '../context/AuthContext'
 import { addSaldo, getUsuarioByEmail } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
+import { getFavoritos, removeFavorito } from '../services/favoritosService'
+import { getHistorial } from '../services/historialService'
+
 
 interface PerfilData {
     id: number
@@ -25,6 +28,21 @@ export default function PerfilPage() {
     const [amount, setAmount] = useState('')
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [successMsg, setSuccessMsg] = useState<string | null>(null)
+    const [favoritos, setFavoritos] = useState<string[]>([])
+
+    const [historial, setHistorial] = useState<string[]>([])
+
+    useEffect(() => {
+        getHistorial()
+            .then(setHistorial)
+            .catch(() => { })
+    }, [])
+
+    useEffect(() => {
+        getFavoritos()
+            .then(setFavoritos)
+            .catch(() => { })
+    }, [])
 
     useEffect(() => {
         if (!usuario) {
@@ -33,23 +51,28 @@ export default function PerfilPage() {
         }
         setPerfil(usuario as any)
         setLoading(false)
-        ;(async () => {
-            try {
-                const fresh = await getUsuarioByEmail(usuario.email)
-                if (fresh) {
-                    setPerfil(fresh)
-                    try {
-                        sessionStorage.setItem('techpark_usuario', JSON.stringify(fresh))
-                    } catch {}
+            ; (async () => {
+                try {
+                    const fresh = await getUsuarioByEmail(usuario.email)
+                    if (fresh) {
+                        setPerfil(fresh)
+                        try {
+                            sessionStorage.setItem('techpark_usuario', JSON.stringify(fresh))
+                        } catch { }
+                    }
+                } catch (e) {
+                    console.debug('No se pudo refrescar perfil', e)
                 }
-            } catch (e) {
-                console.debug('No se pudo refrescar perfil', e)
-            }
-        })()
+            })()
     }, [usuario])
 
     const handleLogout = () => {
         logout().then(() => navigate('/login'))
+    }
+
+    const handleRemoveFavorito = async (id: string) => {
+        const updated = await removeFavorito(id)
+        setFavoritos(updated)
     }
 
     async function handleAddSaldo() {
@@ -68,7 +91,7 @@ export default function PerfilPage() {
             setPerfil(usuario as any)
             try {
                 sessionStorage.setItem('techpark_usuario', JSON.stringify(usuario))
-            } catch {}
+            } catch { }
             setAmount('')
             setSuccessMsg('Saldo agregado')
 
@@ -78,9 +101,9 @@ export default function PerfilPage() {
                     setPerfil(fresh)
                     try {
                         sessionStorage.setItem('techpark_usuario', JSON.stringify(fresh))
-                    } catch {}
+                    } catch { }
                 }
-            } catch {}
+            } catch { }
         } catch (e: any) {
             console.error('Error agregando saldo', e)
             const status = e?.response?.status
@@ -89,8 +112,8 @@ export default function PerfilPage() {
         } finally {
             setAdding(false)
         }
-    }
 
+    }
     if (loading) return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen flex items-center justify-center">
@@ -180,6 +203,40 @@ export default function PerfilPage() {
                     >
                         Cerrar sesión
                     </button>
+                    {/* Favoritos */}
+                    {favoritos.length > 0 && (
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Atracciones Favoritas</p>
+                            <div className="flex flex-wrap gap-2">
+                                {favoritos.map(id => (
+                                    <div key={id} className="flex items-center gap-2 bg-zinc-800 rounded-lg px-3 py-2">
+                                        <span className="text-sm text-yellow-400">★ {id}</span>
+                                        <button
+                                            onClick={() => handleRemoveFavorito(id)}
+                                            className="text-zinc-500 hover:text-red-400 text-xs"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {/* Historial */}
+                    {historial.length > 0 && (
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Historial de Visitas</p>
+                            <div className="flex flex-col gap-2">
+                                {historial.map((id, index) => (
+                                    <div key={index} className="flex items-center gap-3 bg-zinc-800 rounded-lg px-3 py-2">
+                                        <span className="text-zinc-500 text-xs w-5">{index + 1}</span>
+                                        <span className="text-sm text-zinc-300">{id}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </MainLayout>
