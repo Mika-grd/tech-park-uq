@@ -23,7 +23,7 @@ export default function LoginPage() {
       await login(email.trim(), password)
       navigate('/')
     } catch {
-      setError('Credenciales incorrectas o cuenta inactiva.')
+  setError('Credenciales incorrectas o cuenta inactiva.')
     } finally {
       setSubmitting(false)
     }

@@ -39,9 +39,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/usuarios/login",
-                                "/api/usuarios/logout",
-                                "/api/usuarios/register",
-                                "/api/usuarios/existe-email")
+                                        "/api/usuarios/logout",
+                                        "/api/usuarios/register",
+                                        "/api/usuarios/existe-email",
+                                        "/api/usuarios/saldo")
                         .permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/atracciones/**").permitAll()

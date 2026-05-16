@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import MainLayout from '../layouts/MainLayout'
 import { useAuth } from '../context/AuthContext'
-import { api } from '../services/api'
+import { addSaldo, getUsuarioByEmail } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 interface PerfilData {
@@ -21,6 +21,10 @@ export default function PerfilPage() {
     const navigate = useNavigate()
     const [perfil, setPerfil] = useState<PerfilData | null>(null)
     const [loading, setLoading] = useState(true)
+    const [adding, setAdding] = useState(false)
+    const [amount, setAmount] = useState('')
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
+    const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
     useEffect(() => {
         if (!usuario) {
@@ -29,10 +33,62 @@ export default function PerfilPage() {
         }
         setPerfil(usuario as any)
         setLoading(false)
+        ;(async () => {
+            try {
+                const fresh = await getUsuarioByEmail(usuario.email)
+                if (fresh) {
+                    setPerfil(fresh)
+                    try {
+                        sessionStorage.setItem('techpark_usuario', JSON.stringify(fresh))
+                    } catch {}
+                }
+            } catch (e) {
+                console.debug('No se pudo refrescar perfil', e)
+            }
+        })()
     }, [usuario])
 
     const handleLogout = () => {
         logout().then(() => navigate('/login'))
+    }
+
+    async function handleAddSaldo() {
+        setErrorMsg(null)
+        setSuccessMsg(null)
+        if (!amount) return
+        const v = Number.parseFloat(amount)
+        if (Number.isNaN(v) || v <= 0) {
+            setErrorMsg('Monto inválido')
+            return
+        }
+        setAdding(true)
+        try {
+            const res = await addSaldo(v)
+            const usuario = res.usuario
+            setPerfil(usuario as any)
+            try {
+                sessionStorage.setItem('techpark_usuario', JSON.stringify(usuario))
+            } catch {}
+            setAmount('')
+            setSuccessMsg('Saldo agregado')
+
+            try {
+                const fresh = await getUsuarioByEmail(usuario.email)
+                if (fresh) {
+                    setPerfil(fresh)
+                    try {
+                        sessionStorage.setItem('techpark_usuario', JSON.stringify(fresh))
+                    } catch {}
+                }
+            } catch {}
+        } catch (e: any) {
+            console.error('Error agregando saldo', e)
+            const status = e?.response?.status
+            const body = e?.response?.data
+            setErrorMsg(`Error ${status ?? ''}: ${body?.message ?? JSON.stringify(body) ?? 'Error agregando saldo'}`)
+        } finally {
+            setAdding(false)
+        }
     }
 
     if (loading) return (
@@ -82,12 +138,38 @@ export default function PerfilPage() {
                     </div>
 
                     {/* Saldo virtual */}
-                    {perfil?.saldoVirtual !== undefined && (
+                    {(perfil?.rol === 'Visitante' || perfil?.saldoVirtual !== undefined) && (
                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">Saldo Virtual</p>
-                            <p className="text-4xl font-bold text-green-400">
-                                ${perfil.saldoVirtual.toLocaleString()}
-                            </p>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">Saldo Virtual</p>
+                                    <p className="text-4xl font-bold text-green-400">
+                                        ${((perfil?.saldoVirtual ?? 0)).toLocaleString()}
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        min={0.01}
+                                        step="0.01"
+                                        placeholder="Monto a agregar"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        className="w-40 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none"
+                                    />
+                                    <button
+                                        onClick={handleAddSaldo}
+                                        disabled={adding}
+                                        className="rounded-lg bg-green-600 px-4 py-2 text-black font-semibold disabled:opacity-50"
+                                    >
+                                        {adding ? 'Procesando…' : 'Agregar'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {errorMsg && <p className="text-sm text-red-400 mt-3">{errorMsg}</p>}
+                            {successMsg && <p className="text-sm text-green-300 mt-3">{successMsg}</p>}
                         </div>
                     )}
 

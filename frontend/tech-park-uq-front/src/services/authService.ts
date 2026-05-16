@@ -13,12 +13,21 @@ export async function register(payload: RegisterPayload): Promise<LoginResponse>
     nombre: payload.nombre,
     documento: payload.documento,
     edad: payload.edad,
-    estatura: payload.estatura,
-    saldoVirtual: payload.saldoVirtual ?? 0,
+  estatura: payload.estatura,
   })
   return data
 }
 
 export async function logout(): Promise<void> {
   await api.post('/usuarios/logout')
+}
+
+export async function addSaldo(amount: number): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponse>('/usuarios/saldo', { amount })
+  return data
+}
+
+export async function getUsuarioByEmail(email: string) {
+  const { data } = await api.get('/usuarios/por-email', { params: { email } })
+  return data as any
 }

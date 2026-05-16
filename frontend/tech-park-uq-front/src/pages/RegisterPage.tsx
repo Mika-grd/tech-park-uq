@@ -10,8 +10,7 @@ export default function RegisterPage() {
         nombre: '',
         documento: '',
         edad: '',
-        estatura: '',
-        saldoVirtual: '0'
+        estatura: ''
     })
     const [error, setError] = useState('')
     const [cargando, setCargando] = useState(false)
@@ -38,7 +37,7 @@ export default function RegisterPage() {
             documento: form.documento,
             edad: Number(form.edad),
             estatura: Number(form.estatura),
-            saldoVirtual: Number(form.saldoVirtual)
+            // initial saldo handled by backend (defaults to 0)
         })
             .then(() => navigate('/'))
             .catch(err => {
@@ -73,7 +72,7 @@ export default function RegisterPage() {
                         { label: 'Documento', name: 'documento', type: 'text' },
                         { label: 'Edad', name: 'edad', type: 'number' },
                         { label: 'Estatura (m)', name: 'estatura', type: 'number' },
-                        { label: 'Saldo virtual', name: 'saldoVirtual', type: 'number' },
+                        // saldoVirtual removed from registration form
                     ].map(campo => (
                         <div key={campo.name}>
                             <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>

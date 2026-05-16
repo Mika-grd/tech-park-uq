@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const [documento, setDocumento] = useState('')
   const [edad, setEdad] = useState('')
   const [estatura, setEstatura] = useState('')
-  const [saldoVirtual, setSaldoVirtual] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -43,30 +42,28 @@ export default function RegisterPage() {
       setError('Indica una estatura válida (metros o cm según convención del parque).')
       return
     }
-    let saldoNum = 0
-    if (saldoVirtual.trim() !== '') {
-      saldoNum = Number.parseFloat(saldoVirtual)
-      if (Number.isNaN(saldoNum) || saldoNum < 0) {
-        setError('Saldo inicial inválido.')
-        return
-      }
-    }
+  // saldoVirtual is not allowed to be set at registration; backend will default to 0
 
     setSubmitting(true)
     try {
-      await registerUser({
+  await registerUser({
         nombre: nombre.trim(),
         email: email.trim(),
         password,
         documento: documento.trim(),
         edad: edadNum,
         estatura: estaturaNum,
-        saldoVirtual: saldoNum,
       })
       navigate('/')
     } catch (err: unknown) {
+      console.error('Register error', err)
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
+        const serverMsg = err.response?.data && (err.response?.data as any).message
+        if (serverMsg) {
+          setError(String(serverMsg))
+          return
+        }
         if (status === 409) {
           setError('Ese correo ya está registrado.')
           return
@@ -146,18 +143,6 @@ export default function RegisterPage() {
             />
           </label>
         </div>
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
-          Saldo inicial (opcional)
-          <input
-            type="number"
-            min={0}
-            step="0.01"
-            value={saldoVirtual}
-            onChange={(e) => setSaldoVirtual(e.target.value)}
-            className={inputClass}
-            placeholder="0"
-          />
-        </label>
         <label className="flex flex-col gap-1 text-sm text-zinc-400">
           Contraseña
           <input

@@ -118,12 +118,53 @@ public class UsuarioService {
         return usuarioRepository.save(visitante);
     }
 
+    @Transactional
+    public Usuario addSaldoToUser(long userId, Double amount) {
+        if (amount == null || amount <= 0) throw new IllegalArgumentException("Amount must be positive");
+        Usuario usuario = usuarioRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        // Only visitantes have saldoVirtual, but model Visitante extends Usuario — use reflection via getter/setter
+        double current = 0.0;
+        try {
+            java.lang.reflect.Method getter = usuario.getClass().getMethod("getSaldoVirtual");
+            Object val = getter.invoke(usuario);
+            if (val instanceof Number) current = ((Number) val).doubleValue();
+        } catch (NoSuchMethodException ignored) {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        double next = current + amount;
+        try {
+            java.lang.reflect.Method setter = usuario.getClass().getMethod("setSaldoVirtual", double.class);
+            setter.invoke(usuario, next);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return usuarioRepository.save(usuario);
+    }
+
     private UsuarioResponse toResponse(Usuario usuario) {
+    if (usuario instanceof com.techpark.model.Visitante v) {
         return new UsuarioResponse(
-                usuario.getId(),
-                usuario.getEmail(),
-                usuario.getNombre(),
-                usuario.getRol(),
-                usuario.isActivo());
+            usuario.getId(),
+            usuario.getEmail(),
+            usuario.getNombre(),
+            usuario.getRol(),
+            usuario.isActivo(),
+            v.getDocumento(),
+            v.getEdad(),
+            v.getEstatura(),
+            v.getSaldoVirtual()
+        );
+    }
+    return new UsuarioResponse(
+        usuario.getId(),
+        usuario.getEmail(),
+        usuario.getNombre(),
+        usuario.getRol(),
+        usuario.isActivo(),
+        null,
+        null,
+        null,
+        null);
     }
 }

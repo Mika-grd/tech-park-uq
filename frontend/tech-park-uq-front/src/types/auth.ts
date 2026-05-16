@@ -4,6 +4,10 @@ export type Usuario = {
   nombre: string
   rol: string
   activo: boolean
+  documento?: string | null
+  edad?: number | null
+  estatura?: number | null
+  saldoVirtual?: number | null
 }
 
 export type LoginResponse = {
