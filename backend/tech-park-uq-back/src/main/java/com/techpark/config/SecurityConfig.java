@@ -37,6 +37,14 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(
+                                "/api/usuarios/login",
+                                        "/api/usuarios/logout",
+                                        "/api/usuarios/register",
+                                        "/api/usuarios/existe-email",
+                                        "/api/usuarios/saldo")
+                        .permitAll()
+                        .requestMatchers("/api/dev/**").permitAll()
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/visitante/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
