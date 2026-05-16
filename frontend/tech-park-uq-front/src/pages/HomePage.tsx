@@ -9,12 +9,32 @@ interface Atraccion {
 
 export default function HomePage() {
   const [atracciones, setAtracciones] = useState<Atraccion[]>([])
+  const [seeding, setSeeding] = useState(false)
+  const [seedMsg, setSeedMsg] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadAtracciones = () =>
     api.get('/atracciones')
       .then(res => setAtracciones(Array.isArray(res.data) ? res.data : []))
       .catch(err => console.error(err))
+
+  useEffect(() => {
+    loadAtracciones()
   }, [])
+
+  async function handleSeed() {
+    setSeedMsg(null)
+    setSeeding(true)
+    try {
+      const res = await api.post('/dev/seed')
+      setSeedMsg(`Seed listo: +${res.data?.zonasCreated ?? 0} zonas, +${res.data?.atraccionesCreated ?? 0} atracciones, +${res.data?.usuariosCreated ?? 0} usuarios`)
+      loadAtracciones()
+    } catch (e: any) {
+      console.error('Error seedeando', e)
+      setSeedMsg(`Error: ${e?.response?.status ?? ''} ${e?.response?.data?.message ?? JSON.stringify(e?.response?.data) ?? ''}`)
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   const total = atracciones.length
   const activas = atracciones.filter(a => a.estado === 'ACTIVA').length
@@ -40,6 +60,19 @@ export default function HomePage() {
             >
               Ver Atracciones
             </Link>
+
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <button
+                onClick={handleSeed}
+                disabled={seeding}
+                className="px-6 py-3 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 transition tracking-widest text-xs uppercase disabled:opacity-50"
+              >
+                {seeding ? 'Cargando datos…' : 'Cargar datos demo (seed)'}
+              </button>
+              {seedMsg && (
+                <p className="text-xs text-zinc-400 max-w-xl break-words">{seedMsg}</p>
+              )}
+            </div>
           </div>
         </div>
 

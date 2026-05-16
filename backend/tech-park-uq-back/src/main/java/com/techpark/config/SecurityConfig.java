@@ -44,6 +44,7 @@ public class SecurityConfig {
                                         "/api/usuarios/existe-email",
                                         "/api/usuarios/saldo")
                         .permitAll()
+                        .requestMatchers("/api/dev/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/atracciones/**").permitAll()
                         .requestMatchers("/api/zonas/**").permitAll()
