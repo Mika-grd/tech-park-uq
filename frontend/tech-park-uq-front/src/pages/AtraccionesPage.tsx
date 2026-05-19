@@ -3,6 +3,7 @@ import { api } from '../services/api'
 import MainLayout from '../layouts/MainLayout'
 import { getFavoritos, addFavorito, removeFavorito } from '../services/favoritosService'
 import { registrarVisita } from '../services/historialService'
+import { unirseAFila } from '../services/filaService'
 
 interface Atraccion {
     id: string
@@ -42,6 +43,8 @@ export default function AtraccionesPage() {
 
     const [favoritos, setFavoritos] = useState<string[]>([])
 
+    const [posicionFila, setPosicionFila] = useState<Record<string, number>>({})
+
     useEffect(() => {
         getFavoritos()
             .then(setFavoritos)
@@ -59,8 +62,15 @@ export default function AtraccionesPage() {
     }
 
     const handleVisitar = async (id: string) => {
-        await registrarVisita(id)
+        try {
+            const res = await unirseAFila(id)
+            await registrarVisita(id)
+            setPosicionFila(prev => ({ ...prev, [id]: res.posicion }))
+        } catch (e: any) {
+            alert(e?.response?.data?.message ?? 'Error al unirse a la fila')
+        }
     }
+
 
     const cargarAtracciones = () => {
         setLoading(true)
@@ -196,7 +206,7 @@ export default function AtraccionesPage() {
                                         onClick={() => handleVisitar(a.id)}
                                         className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
                                     >
-                                        Visitar
+                                        {posicionFila[a.id] ? `#${posicionFila[a.id]} en fila` : 'Visitar'}
                                     </button>
                                 </div>
                             </div>

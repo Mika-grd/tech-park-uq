@@ -5,7 +5,7 @@ import { addSaldo, getUsuarioByEmail } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 import { getFavoritos, removeFavorito } from '../services/favoritosService'
 import { getHistorial } from '../services/historialService'
-
+import { getTicketActivo, comprarTicket, type TipoTicket, type TicketActivo } from '../services/ticketService'
 
 interface PerfilData {
     id: number
@@ -31,12 +31,32 @@ export default function PerfilPage() {
     const [favoritos, setFavoritos] = useState<string[]>([])
 
     const [historial, setHistorial] = useState<string[]>([])
+    const [ticket, setTicket] = useState<TicketActivo | null>(null)
+    const [comprandoTicket, setComprandoTicket] = useState(false)
 
     useEffect(() => {
         getHistorial()
             .then(setHistorial)
             .catch(() => { })
     }, [])
+
+    useEffect(() => {
+        getTicketActivo().then(setTicket).catch(() => {})
+    }, [])
+
+    const handleComprarTicket = async (tipo: TipoTicket) => {
+        setComprandoTicket(true)
+        try {
+            const t = await comprarTicket(tipo)
+            setTicket(t)
+            const fresh = await getUsuarioByEmail(usuario!.email)
+            if (fresh) setPerfil(fresh)
+        } catch (e: any) {
+            alert(e?.response?.data?.message ?? 'Error al comprar ticket')
+        } finally {
+            setComprandoTicket(false)
+        }
+    }
 
     useEffect(() => {
         getFavoritos()
@@ -195,6 +215,53 @@ export default function PerfilPage() {
                             {successMsg && <p className="text-sm text-green-300 mt-3">{successMsg}</p>}
                         </div>
                     )}
+
+                    {/* Ticket */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Mi Ticket</p>
+                        {ticket ? (
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className={`text-sm font-bold px-3 py-1 rounded-full ${
+                                        ticket.tipo === 'FAST_PASS' ? 'bg-purple-600 text-white' :
+                                        ticket.tipo === 'FAMILIAR' ? 'bg-blue-600 text-white' :
+                                        'bg-zinc-600 text-white'
+                                    }`}>
+                                        {ticket.tipo.replace('_', ' ')}
+                                    </span>
+                                    <p className="text-zinc-400 text-xs mt-2">
+                                        Comprado el {new Date(ticket.fechaCompra).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-zinc-400 text-xs">Precio: ${ticket.precio.toLocaleString()}</p>
+                                </div>
+                                <button
+                                    onClick={() => handleComprarTicket(ticket.tipo)}
+                                    disabled={comprandoTicket}
+                                    className="text-xs border border-zinc-600 text-zinc-400 px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition disabled:opacity-50"
+                                >
+                                    Renovar
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 gap-3">
+                                {([
+                                    { tipo: 'GENERAL' as TipoTicket, precio: 50000, color: 'border-zinc-600 hover:bg-zinc-800' },
+                                    { tipo: 'FAMILIAR' as TipoTicket, precio: 35000, color: 'border-blue-700 hover:bg-blue-950' },
+                                    { tipo: 'FAST_PASS' as TipoTicket, precio: 80000, color: 'border-purple-700 hover:bg-purple-950' },
+                                ]).map(({ tipo, precio, color }) => (
+                                    <button
+                                        key={tipo}
+                                        onClick={() => handleComprarTicket(tipo)}
+                                        disabled={comprandoTicket}
+                                        className={`flex flex-col items-center gap-1 border rounded-xl p-4 transition disabled:opacity-50 ${color}`}
+                                    >
+                                        <span className="text-sm font-bold text-white">{tipo.replace('_', ' ')}</span>
+                                        <span className="text-xs text-zinc-400">${precio.toLocaleString()}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     {/* Cerrar sesión */}
                     <button
