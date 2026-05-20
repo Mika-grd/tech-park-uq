@@ -170,7 +170,7 @@ export default function PerfilPage() {
                                 { label: 'Email', value: perfil?.email },
                                 { label: 'Documento', value: perfil?.documento ?? '—' },
                                 { label: 'Edad', value: perfil?.edad ? `${perfil.edad} años` : '—' },
-                                { label: 'Estatura', value: perfil?.estatura ? `${perfil.estatura} m` : '—' },
+                                { label: 'Estatura', value: perfil?.estatura ? `${perfil.estatura} cm` : '—' },
                             ].map(item => (
                                 <div key={item.label} className="bg-zinc-800 rounded-xl p-4">
                                     <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">{item.label}</p>

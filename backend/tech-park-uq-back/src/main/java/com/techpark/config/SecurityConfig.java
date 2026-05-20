@@ -39,10 +39,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/usuarios/login",
-                                        "/api/usuarios/logout",
-                                        "/api/usuarios/register",
-                                        "/api/usuarios/existe-email",
-                                        "/api/usuarios/saldo")
+                                "/api/usuarios/logout",
+                                "/api/usuarios/register",
+                                "/api/usuarios/existe-email",
+                                "/api/usuarios/saldo")
                         .permitAll()
                         .requestMatchers("/api/dev/**").permitAll()
                         .requestMatchers("/api/usuarios/**").permitAll()
@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/atracciones/**").permitAll()
                         .requestMatchers("/api/zonas/**").permitAll()
+                        .requestMatchers("/api/ruta", "/api/ruta/**").permitAll()
+
                         .anyRequest().authenticated())
                 .headers(h -> h.frameOptions(frame -> frame.sameOrigin()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

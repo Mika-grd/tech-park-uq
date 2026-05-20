@@ -177,7 +177,7 @@ export default function AtraccionesPage() {
                                 </div>
                                 <p className="text-zinc-400 text-sm mb-1">Tipo: {a.tipo}</p>
                                 <p className="text-zinc-400 text-sm mb-1">Capacidad: {a.capacidadMaxima}</p>
-                                <p className="text-zinc-400 text-sm mb-1">Altura mínima: {a.alturaMinima}m</p>
+                                <p className="text-zinc-400 text-sm mb-1">Altura mínima: {a.alturaMinima}cm</p>
                                 <p className="text-zinc-400 text-sm mb-1">Edad mínima: {a.edadMinima} años</p>
                                 <p className="text-zinc-400 text-sm mb-4">⏱ Espera: {a.tiempoEspera} min</p>
                                 <div className="flex gap-2">
@@ -227,7 +227,7 @@ export default function AtraccionesPage() {
                                     { label: 'ID', name: 'id', type: 'text' },
                                     { label: 'Nombre', name: 'nombre', type: 'text' },
                                     { label: 'Capacidad máxima', name: 'capacidadMaxima', type: 'number' },
-                                    { label: 'Altura mínima (m)', name: 'alturaMinima', type: 'number' },
+                                    { label: 'Altura mínima (cm)', name: 'alturaMinima', type: 'number' },
                                     { label: 'Edad mínima', name: 'edadMinima', type: 'number' },
                                     { label: 'Costo adicional', name: 'costoAdicional', type: 'number' },
                                     { label: 'Tiempo de espera (min)', name: 'tiempoEspera', type: 'number' },

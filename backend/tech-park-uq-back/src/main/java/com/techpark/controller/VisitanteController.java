@@ -9,9 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.techpark.model.Ticket;
 import com.techpark.service.FilaService;
 import com.techpark.service.TicketService;
+import com.techpark.service.VisitaService;
 
 @RestController
 @RequestMapping("/api/visitante")
@@ -29,6 +29,8 @@ public class VisitanteController {
     private FilaService filaService;
     @Autowired
     private TicketService ticketService;
+    @Autowired
+    private VisitaService visitaService;
 
     private Long extractUserId(HttpServletRequest request) {
         String cookieName = jwtCookieFactory.getCookieName();
@@ -92,15 +94,13 @@ public class VisitanteController {
     @PostMapping("/fila/{atraccionId}")
     public ResponseEntity<?> unirseAFila(@PathVariable String atraccionId, HttpServletRequest request) {
         Long userId = extractUserId(request);
-        if (userId == null)
-            return ResponseEntity.status(401).build();
-        java.util.Optional<Ticket> ticketOpt = ticketService.getTicketActivo(userId);
-        if (ticketOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("message", "No tienes un ticket activo"));
+        if (userId == null) return ResponseEntity.status(401).build();
+        try {
+            java.util.Map<String, Object> result = visitaService.unirseAFila(userId, atraccionId);
+            return ResponseEntity.ok(result);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
         }
-        filaService.unirse(userId, atraccionId, ticketOpt.get().getTipo());
-        int posicion = filaService.getPosicion(userId, atraccionId);
-        return ResponseEntity.ok(java.util.Map.of("posicion", posicion));
     }
 
     @GetMapping("/fila/{atraccionId}/posicion")
