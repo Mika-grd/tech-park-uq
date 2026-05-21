@@ -25,7 +25,13 @@ export default function LoginPage() {
         setCargando(true)
         setError('')
         login(form.email, form.password)
-            .then(() => navigate('/'))
+            .then((usuario) => {
+                if (usuario.rol === 'Administrador' || usuario.rol === 'Operador') {
+                    navigate('/')
+                } else {
+                    navigate('/mapa')
+                }
+            })
             .catch(() => setError('Credenciales incorrectas'))
             .finally(() => setCargando(false))
     }

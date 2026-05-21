@@ -15,7 +15,7 @@ const STORAGE_KEY = 'techpark_usuario'
 type AuthContextValue = {
   usuario: Usuario | null
   ready: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<Usuario>
   register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
 }
@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authService.login(email, password)
     setUsuario(res.usuario)
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(res.usuario))
+    return res.usuario
   }, [])
 
   const register = useCallback(async (payload: RegisterPayload) => {
