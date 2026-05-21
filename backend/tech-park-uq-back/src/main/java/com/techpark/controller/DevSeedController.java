@@ -75,8 +75,12 @@ public class DevSeedController {
         zonaRepository.deleteAll();
         usuarioRepository.deleteAll();
 
+        //Hacemos los datos base para que el admin siempre exista aunque se limpie la base. :)
+        int usuariosCreated = seedUsuarios();
+
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("message", "DB cleared");
+        out.put("message", "DB cleared and base users re-seeded");
+        out.put("usuariosCreated", usuariosCreated);
         out.put("zonaCount", zonaRepository.count());
         out.put("atraccionCount", atraccionRepository.count());
         out.put("usuarioCount", usuarioRepository.count());
