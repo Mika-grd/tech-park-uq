@@ -38,7 +38,13 @@ export default function RegisterPage() {
             estatura: Number(form.estatura),
             // initial saldo handled by backend (defaults to 0)
         })
-            .then(() => navigate('/'))
+            .then((usuario) => {
+                if (usuario?.rol === 'Administrador' || usuario?.rol === 'Operador') {
+                    navigate('/')
+                } else {
+                    navigate('/mapa')
+                }
+            })
             .catch(err => {
                 if (err.response?.status === 409) {
                     setError('Este email ya está registrado')
