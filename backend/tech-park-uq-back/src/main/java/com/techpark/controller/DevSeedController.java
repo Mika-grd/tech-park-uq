@@ -6,6 +6,7 @@ import com.techpark.model.Operador;
 import com.techpark.model.Visitante;
 import com.techpark.model.Zona;
 import com.techpark.repository.AtraccionRepository;
+import com.techpark.repository.TicketRepository;
 import com.techpark.repository.UsuarioRepository;
 import com.techpark.repository.ZonaRepository;
 import com.techpark.service.UsuarioService;
@@ -25,17 +26,20 @@ public class DevSeedController {
     private final AtraccionRepository atraccionRepository;
     private final ZonaRepository zonaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final TicketRepository ticketRepository;
     private final UsuarioService usuarioService;
 
     public DevSeedController(
             AtraccionRepository atraccionRepository,
             ZonaRepository zonaRepository,
             UsuarioRepository usuarioRepository,
+            TicketRepository ticketRepository,
             UsuarioService usuarioService
     ) {
         this.atraccionRepository = atraccionRepository;
         this.zonaRepository = zonaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.ticketRepository = ticketRepository;
         this.usuarioService = usuarioService;
     }
 
@@ -69,8 +73,7 @@ public class DevSeedController {
     @PostMapping("/clear")
     @Transactional
     public ResponseEntity<Map<String, Object>> clearDb() {
-        // Orden: primero entidades que dependen de otras.
-        // En este proyecto las relaciones son mínimas, pero mantenemos un orden seguro.
+        ticketRepository.deleteAll();
         atraccionRepository.deleteAll();
         zonaRepository.deleteAll();
         usuarioRepository.deleteAll();
@@ -152,7 +155,7 @@ public class DevSeedController {
         int created = 0;
 
         // Admin
-        created += seedAdmin("admin@techpark.com", "Admin", "admin12345");
+        created += seedAdmin("admin@techpark.com", "Juanes", "admin12345");
 
         // Operadores
         created += seedOperador("op1@techpark.com", "Operador 1", "op123456", "Z-01");
@@ -198,14 +201,21 @@ public class DevSeedController {
     }
 
     private int seedAdmin(String email, String nombre, String rawPassword) {
-        if (usuarioRepository.existsByEmail(email)) return 0;
-        Administrador a = new Administrador();
-        a.setEmail(email);
-        a.setNombre(nombre);
-        a.setPassword(usuarioService.encodePasswordForStorage(rawPassword));
-        a.setActivo(true);
-        usuarioRepository.save(a);
-        return 1;
+        return usuarioRepository.findByEmail(email)
+                .map(existing -> {
+                    existing.setNombre(nombre);
+                    usuarioRepository.save(existing);
+                    return 0;
+                })
+                .orElseGet(() -> {
+                    Administrador a = new Administrador();
+                    a.setEmail(email);
+                    a.setNombre(nombre);
+                    a.setPassword(usuarioService.encodePasswordForStorage(rawPassword));
+                    a.setActivo(true);
+                    usuarioRepository.save(a);
+                    return 1;
+                });
     }
 
     private int seedOperador(String email, String nombre, String rawPassword, String zonaAsignada) {
