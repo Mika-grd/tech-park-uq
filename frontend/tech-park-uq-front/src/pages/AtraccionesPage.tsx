@@ -4,6 +4,7 @@ import MainLayout from '../layouts/MainLayout'
 import { getFavoritos, addFavorito, removeFavorito } from '../services/favoritosService'
 import { registrarVisita } from '../services/historialService'
 import { unirseAFila } from '../services/filaService'
+import { useAuth } from '../context/AuthContext'
 
 interface Atraccion {
     id: string
@@ -34,6 +35,8 @@ const estadoInicial = {
 }
 
 export default function AtraccionesPage() {
+    const { usuario } = useAuth()
+    const puedeEditar = usuario?.rol === 'Administrador' || usuario?.rol === 'Operador'
     const [atracciones, setAtracciones] = useState<Atraccion[]>([])
     const [loading, setLoading] = useState(true)
     const [modalAbierto, setModalAbierto] = useState(false)
@@ -152,12 +155,14 @@ export default function AtraccionesPage() {
                     <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100">
                         Atracciones
                     </h1>
-                    <button
-                        onClick={abrirNuevo}
-                        className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-zinc-300 transition"
-                    >
-                        + Nueva
-                    </button>
+                    {puedeEditar && (
+                        <button
+                            onClick={abrirNuevo}
+                            className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-zinc-300 transition"
+                        >
+                            + Nueva
+                        </button>
+                    )}
                 </div>
 
                 {/* Lista */}
@@ -190,18 +195,22 @@ export default function AtraccionesPage() {
                                     >
                                         {favoritos.includes(a.id) ? '★ Favorito' : '☆ Favorito'}
                                     </button>
-                                    <button
-                                        onClick={() => abrirEditar(a)}
-                                        className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleEliminar(a.id)}
-                                        className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition"
-                                    >
-                                        Eliminar
-                                    </button>
+                                    {puedeEditar && (
+                                        <>
+                                            <button
+                                                onClick={() => abrirEditar(a)}
+                                                className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() => handleEliminar(a.id)}
+                                                className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </>
+                                    )}
                                     <button
                                         onClick={() => handleVisitar(a.id)}
                                         className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
