@@ -1,12 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-const links = [
-    { path: '/', label: 'Inicio' },
-    { path: '/atracciones', label: 'Atracciones' },
-    { path: '/zonas', label: 'Zonas' },
-    { path: '/mapa', label: 'Mapa' },
-    { path: '/estadisticas', label: 'Estadísticas' },
+const allLinks = [
+    { path: '/', label: 'Inicio', roles: null },
+    { path: '/atracciones', label: 'Atracciones', roles: null },
+    { path: '/zonas', label: 'Zonas', roles: null },
+    { path: '/mapa', label: 'Mapa', roles: null },
+    { path: '/estadisticas', label: 'Estadísticas', roles: ['Administrador', 'Operador'] },
 ]
 
 export default function Navbar() {
@@ -17,6 +17,10 @@ export default function Navbar() {
     const handleLogout = () => {
         logout().then(() => navigate('/login'))
     }
+
+    const links = allLinks.filter(link =>
+        !link.roles || (usuario && link.roles.includes(usuario.rol))
+    )
 
     return (
         <nav className="bg-zinc-950 border-b border-zinc-800 px-8 py-4 flex items-center justify-between">

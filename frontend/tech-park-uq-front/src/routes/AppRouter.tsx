@@ -21,7 +21,7 @@ export default function AppRouter() {
         <Route path="/zonas" element={<ProtectedRoute><ZonasPage /></ProtectedRoute>} />
         <Route path="/mapa" element={<ProtectedRoute><MapaPage /></ProtectedRoute>} />
         <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
-        <Route path="/estadisticas" element={<ProtectedRoute><EstadisticasPage /></ProtectedRoute>} />
+        <Route path="/estadisticas" element={<ProtectedRoute roles={['Administrador', 'Operador']}><EstadisticasPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
