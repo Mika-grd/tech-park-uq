@@ -64,6 +64,21 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/admin")
+    public ResponseEntity<?> crearAdmin(@RequestBody RegisterRequest body) {
+        try {
+            Usuario usuario = usuarioService.crearAdmin(body);
+            return ResponseEntity.status(201)
+                    .body(new LoginResponse(usuarioService.toUsuarioResponse(usuario)));
+        } catch (EmailAlreadyRegisteredException e) {
+            return ResponseEntity.status(409).body(java.util.Map.of("message", "Email ya registrado"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(java.util.Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         return ResponseEntity.noContent()

@@ -119,6 +119,26 @@ public class UsuarioService {
     }
 
     @Transactional
+    public Usuario crearAdmin(RegisterRequest request) {
+        if (request == null || request.email() == null || request.password() == null) {
+            throw new IllegalArgumentException("Solicitud inválida");
+        }
+        String email = request.email().trim();
+        if (email.isEmpty()) throw new IllegalArgumentException("Correo requerido");
+        if (emailExists(email)) throw new EmailAlreadyRegisteredException();
+        if (request.password().length() < 8) throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+        if (request.nombre() == null || request.nombre().isBlank()) throw new IllegalArgumentException("Nombre requerido");
+
+        com.techpark.model.Administrador admin = new com.techpark.model.Administrador();
+        admin.setEmail(email);
+        admin.setPassword(encodePasswordForStorage(request.password()));
+        admin.setNombre(request.nombre().trim());
+        admin.setActivo(true);
+
+        return usuarioRepository.save(admin);
+    }
+
+    @Transactional
     public Usuario addSaldoToUser(long userId, Double amount) {
         if (amount == null || amount <= 0) throw new IllegalArgumentException("Amount must be positive");
         Usuario usuario = usuarioRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));

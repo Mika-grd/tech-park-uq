@@ -8,6 +8,8 @@ interface Atraccion {
   estado: 'ACTIVA' | 'EN_MANTENIMIENTO' | 'CERRADA'
 }
 
+const adminFormInicial = { nombre: '', email: '', password: '' }
+
 export default function AdminPage() {
   const { usuario, ready } = useAuth()
   const [atracciones, setAtracciones] = useState<Atraccion[]>([])
@@ -15,6 +17,11 @@ export default function AdminPage() {
   const [seedMsg, setSeedMsg] = useState<string | null>(null)
   const [clearing, setClearing] = useState(false)
   const [clearMsg, setClearMsg] = useState<string | null>(null)
+
+  const [modalAdmin, setModalAdmin] = useState(false)
+  const [adminForm, setAdminForm] = useState(adminFormInicial)
+  const [guardandoAdmin, setGuardandoAdmin] = useState(false)
+  const [adminMsg, setAdminMsg] = useState<string | null>(null)
 
   const loadAtracciones = () =>
     api.get('/atracciones')
@@ -61,10 +68,37 @@ export default function AdminPage() {
   const mantenimiento = atracciones.filter(a => a.estado === 'EN_MANTENIMIENTO').length
   const cerradas = atracciones.filter(a => a.estado === 'CERRADA').length
 
+  async function handleCrearAdmin() {
+    if (!adminForm.nombre || !adminForm.email || !adminForm.password) {
+      setAdminMsg('Completa todos los campos')
+      return
+    }
+    setGuardandoAdmin(true)
+    setAdminMsg(null)
+    try {
+      await api.post('/usuarios/admin', {
+        nombre: adminForm.nombre,
+        email: adminForm.email,
+        password: adminForm.password,
+        documento: '',
+        edad: 0,
+        estatura: 0,
+      })
+      setAdminMsg('Administrador creado correctamente')
+      setAdminForm(adminFormInicial)
+    } catch (e: any) {
+      const msg = e?.response?.data?.message
+      if (e?.response?.status === 409) {
+        setAdminMsg('Error: ese email ya está registrado')
+      } else {
+        setAdminMsg(`Error: ${msg ?? 'no se pudo crear el administrador'}`)
+      }
+    } finally {
+      setGuardandoAdmin(false)
+    }
+  }
+
   if (!ready) return null
-
-  const ocultarZonasYAtracciones = usuario?.rol === 'Administrador'
-
   return (
     <MainLayout>
       <main className="bg-black min-h-screen text-white relative">
@@ -117,24 +151,13 @@ export default function AdminPage() {
 
         {/* Tarjetas de gestión */}
         <div className="max-w-5xl mx-auto px-8 grid gap-6 sm:grid-cols-2">
-            {!ocultarZonasYAtracciones && (
-              <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
-                <h2 className="text-xl font-semibold text-white">Gestión de zonas</h2>
-                <p className="mt-2 text-zinc-400">Crea, edita y asigna operadores a las zonas.</p>
-              </article>
-            )}
-
-            {!ocultarZonasYAtracciones && (
-              <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
-                <h2 className="text-xl font-semibold text-white">Gestión de atracciones</h2>
-                <p className="mt-2 text-zinc-400">Administra estados, capacidad y acceso de atracciones.</p>
-              </article>
-            )}
-
-            <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
-              <h2 className="text-xl font-semibold text-white">Gestión de operadores</h2>
-              <p className="mt-2 text-zinc-400">Registra nuevos operadores.</p>
-            </article>
+            <button
+              onClick={() => { setModalAdmin(true); setAdminMsg(null) }}
+              className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-left hover:border-zinc-600 hover:bg-zinc-900 transition w-full"
+            >
+              <h2 className="text-xl font-semibold text-white">Gestión de Administradores</h2>
+              <p className="mt-2 text-zinc-400">Registra nuevos administradores.</p>
+            </button>
 
             <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
               <h2 className="text-xl font-semibold text-white">Reportes</h2>
@@ -156,6 +179,55 @@ export default function AdminPage() {
               </div>
             ))}
         </div>
+
+        {modalAdmin && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-6 tracking-wide">Nuevo Administrador</h2>
+
+              <div className="flex flex-col gap-4">
+                {[
+                  { label: 'Nombre', name: 'nombre', type: 'text' },
+                  { label: 'Email', name: 'email', type: 'email' },
+                  { label: 'Contraseña (mín. 8 caracteres)', name: 'password', type: 'password' },
+                ].map(campo => (
+                  <div key={campo.name}>
+                    <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>
+                    <input
+                      type={campo.type}
+                      name={campo.name}
+                      value={(adminForm as any)[campo.name]}
+                      onChange={e => setAdminForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                      className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {adminMsg && (
+                <p className={`mt-4 text-xs ${adminMsg.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+                  {adminMsg}
+                </p>
+              )}
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => { setModalAdmin(false); setAdminForm(adminFormInicial); setAdminMsg(null) }}
+                  className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCrearAdmin}
+                  disabled={guardandoAdmin}
+                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50"
+                >
+                  {guardandoAdmin ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </MainLayout>
   )
