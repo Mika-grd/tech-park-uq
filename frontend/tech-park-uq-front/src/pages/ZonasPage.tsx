@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import MainLayout from '../layouts/MainLayout'
 import { api } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 
 interface Zona {
     id: string
@@ -17,6 +18,8 @@ const estadoInicial = {
 }
 
 export default function ZonasPage() {
+    const { usuario } = useAuth()
+    const puedeEditar = usuario?.rol === 'Administrador' || usuario?.rol === 'Operador'
     const [zonas, setZonas] = useState<Zona[]>([])
     const [loading, setLoading] = useState(true)
     const [modalAbierto, setModalAbierto] = useState(false)
@@ -95,10 +98,12 @@ export default function ZonasPage() {
                     <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100">
                         Zonas
                     </h1>
-                    <button onClick={abrirNuevo}
-                        className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-zinc-300 transition">
-                        + Nueva
-                    </button>
+                    {puedeEditar && (
+                        <button onClick={abrirNuevo}
+                            className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-zinc-300 transition">
+                            + Nueva
+                        </button>
+                    )}
                 </div>
 
                 {loading ? (
@@ -125,16 +130,18 @@ export default function ZonasPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2">
-                                    <button onClick={() => abrirEditar(z)}
-                                        className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition">
-                                        Editar
-                                    </button>
-                                    <button onClick={() => handleEliminar(z.id)}
-                                        className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition">
-                                        Eliminar
-                                    </button>
-                                </div>
+                                {puedeEditar && (
+                                    <div className="flex gap-2">
+                                        <button onClick={() => abrirEditar(z)}
+                                            className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition">
+                                            Editar
+                                        </button>
+                                        <button onClick={() => handleEliminar(z.id)}
+                                            className="flex-1 text-sm py-1.5 rounded-lg border border-red-800 text-red-400 hover:bg-red-950 transition">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
