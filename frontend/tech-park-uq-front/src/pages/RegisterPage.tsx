@@ -42,7 +42,7 @@ export default function RegisterPage() {
                 if (usuario?.rol === 'Administrador' || usuario?.rol === 'Operador') {
                     navigate('/')
                 } else {
-                    navigate('/mapa')
+                    navigate('/')
                 }
             })
             .catch(err => {

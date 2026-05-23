@@ -67,7 +67,12 @@ export default function AdminPage() {
 
   return (
     <MainLayout>
-      <main className="bg-black min-h-screen text-white">
+      <main className="bg-black min-h-screen text-white relative">
+        {usuario?.nombre && (
+          <p className="absolute top-6 left-8 text-sm text-zinc-400 tracking-widest uppercase">
+            Bienvenido, {usuario.nombre}
+          </p>
+        )}
 
         {/* Hero */}
         <div className="flex items-center justify-center py-24 px-6">

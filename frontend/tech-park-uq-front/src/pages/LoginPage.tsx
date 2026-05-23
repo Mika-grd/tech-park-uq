@@ -29,7 +29,7 @@ export default function LoginPage() {
                 if (usuario.rol === 'Administrador' || usuario.rol === 'Operador') {
                     navigate('/')
                 } else {
-                    navigate('/mapa')
+                    navigate('/')
                 }
             })
             .catch(() => setError('Credenciales incorrectas'))
