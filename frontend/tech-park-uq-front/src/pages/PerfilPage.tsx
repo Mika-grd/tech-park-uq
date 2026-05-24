@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { getFavoritos, removeFavorito } from '../services/favoritosService'
 import { getHistorial } from '../services/historialService'
 import { getTicketActivo, comprarTicket, type TipoTicket, type TicketActivo } from '../services/ticketService'
+import { api } from '../services/api'
 
 interface PerfilData {
     id: number
@@ -29,10 +30,23 @@ export default function PerfilPage() {
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [successMsg, setSuccessMsg] = useState<string | null>(null)
     const [favoritos, setFavoritos] = useState<string[]>([])
+    const [nombresAtracciones, setNombresAtracciones] = useState<Record<string, string>>({})
 
     const [historial, setHistorial] = useState<string[]>([])
     const [ticket, setTicket] = useState<TicketActivo | null>(null)
     const [comprandoTicket, setComprandoTicket] = useState(false)
+
+    useEffect(() => {
+        api.get('/atracciones')
+            .then(res => {
+                const mapa: Record<string, string> = {}
+                if (Array.isArray(res.data)) {
+                    res.data.forEach((a: { id: string; nombre: string }) => { mapa[a.id] = a.nombre })
+                }
+                setNombresAtracciones(mapa)
+            })
+            .catch(() => { })
+    }, [])
 
     useEffect(() => {
         getHistorial()
@@ -277,7 +291,7 @@ export default function PerfilPage() {
                             <div className="flex flex-wrap gap-2">
                                 {favoritos.map(id => (
                                     <div key={id} className="flex items-center gap-2 bg-zinc-800 rounded-lg px-3 py-2">
-                                        <span className="text-sm text-yellow-400">★ {id}</span>
+                                        <span className="text-sm text-yellow-400">★ {nombresAtracciones[id] ?? id}</span>
                                         <button
                                             onClick={() => handleRemoveFavorito(id)}
                                             className="text-zinc-500 hover:text-red-400 text-xs"
@@ -297,7 +311,7 @@ export default function PerfilPage() {
                                 {historial.map((id, index) => (
                                     <div key={index} className="flex items-center gap-3 bg-zinc-800 rounded-lg px-3 py-2">
                                         <span className="text-zinc-500 text-xs w-5">{index + 1}</span>
-                                        <span className="text-sm text-zinc-300">{id}</span>
+                                        <span className="text-sm text-zinc-300">{nombresAtracciones[id] ?? id}</span>
                                     </div>
                                 ))}
                             </div>
