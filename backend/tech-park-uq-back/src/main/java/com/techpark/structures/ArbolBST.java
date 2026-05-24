@@ -52,4 +52,17 @@ public class ArbolBST<T extends Comparable<T>> {
         System.out.println(nodo.dato);
         inordenRec(nodo.derecho);
     }
+
+    public java.util.List<T> inordenLista() {
+        java.util.List<T> lista = new java.util.ArrayList<>();
+        inordenListaRec(raiz, lista);
+        return lista;
+    }
+
+    private void inordenListaRec(NodoArbol<T> nodo, java.util.List<T> lista) {
+        if (nodo == null) return;
+        inordenListaRec(nodo.izquierdo, lista);
+        lista.add(nodo.dato);
+        inordenListaRec(nodo.derecho, lista);
+    }
 }
