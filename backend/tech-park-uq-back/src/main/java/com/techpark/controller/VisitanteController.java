@@ -111,4 +111,15 @@ public class VisitanteController {
         int posicion = filaService.getPosicion(userId, atraccionId);
         return ResponseEntity.ok(java.util.Map.of("posicion", posicion));
     }
+
+    @DeleteMapping("/fila/{atraccionId}")
+    public ResponseEntity<?> salirDeFila(@PathVariable String atraccionId, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+        boolean salido = filaService.salir(userId, atraccionId);
+        if (!salido)
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "No estás en la fila de esta atracción"));
+        return ResponseEntity.ok(java.util.Map.of("message", "Saliste de la fila correctamente"));
+    }
 }

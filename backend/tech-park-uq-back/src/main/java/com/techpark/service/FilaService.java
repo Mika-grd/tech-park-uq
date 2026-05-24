@@ -41,4 +41,23 @@ public class FilaService {
             cola.encolar(temp.desencolar(), posicion);
         return -1;
     }
+
+    public boolean salir(Long userId, String atraccionId) {
+        ColaPrioridad<Long> cola = getFila(atraccionId);
+        ColaPrioridad<Long> temp = new ColaPrioridad<>();
+        boolean encontrado = false;
+        int posicion = 0;
+        while (!cola.estaVacia()) {
+            Long actual = cola.desencolar();
+            posicion++;
+            if (actual.equals(userId)) {
+                encontrado = true;
+            } else {
+                temp.encolar(actual, posicion);
+            }
+        }
+        while (!temp.estaVacia())
+            cola.encolar(temp.desencolar(), posicion);
+        return encontrado;
+    }
 }
