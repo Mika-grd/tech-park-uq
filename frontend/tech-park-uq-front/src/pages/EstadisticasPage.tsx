@@ -120,6 +120,32 @@ export default function EstadisticasPage() {
                             </ResponsiveContainer>
                         </div>
 
+                        {/* Ranking de más visitadas */}
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 lg:col-span-2">
+                            <h2 className="text-lg font-semibold mb-6 tracking-wide">Ranking de atracciones más visitadas</h2>
+                            <div className="flex flex-col gap-3">
+                                {[...atracciones]
+                                    .sort((a, b) => b.visitantesAcumulados - a.visitantesAcumulados)
+                                    .map((a, index) => {
+                                        const max = atracciones.reduce((m, x) => Math.max(m, x.visitantesAcumulados), 1)
+                                        const pct = Math.round((a.visitantesAcumulados / max) * 100)
+                                        return (
+                                            <div key={a.id} className="flex items-center gap-4">
+                                                <span className="text-zinc-500 text-xs w-5 text-right">{index + 1}</span>
+                                                <span className="text-sm text-zinc-300 w-40 truncate">{a.nombre}</span>
+                                                <div className="flex-1 bg-zinc-800 rounded-full h-2">
+                                                    <div
+                                                        className="bg-amber-500 h-2 rounded-full transition-all"
+                                                        style={{ width: `${pct}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs text-zinc-400 w-16 text-right">{a.visitantesAcumulados} visitas</span>
+                                            </div>
+                                        )
+                                    })}
+                            </div>
+                        </div>
+
                         {/* Tabla resumen */}
                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 lg:col-span-2">
                             <h2 className="text-lg font-semibold mb-6 tracking-wide">Resumen de atracciones</h2>
