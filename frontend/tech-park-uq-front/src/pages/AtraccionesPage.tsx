@@ -45,8 +45,23 @@ export default function AtraccionesPage() {
     const [guardando, setGuardando] = useState(false)
 
     const [favoritos, setFavoritos] = useState<string[]>([])
+    const [busqueda, setBusqueda] = useState('')
+    const [buscando, setBuscando] = useState(false)
 
     const [posicionFila, setPosicionFila] = useState<Record<string, number>>({})
+
+    const handleBuscar = async (q: string) => {
+        setBusqueda(q)
+        if (q.trim() === '') {
+            cargarAtracciones()
+            return
+        }
+        setBuscando(true)
+        api.get(`/atracciones/buscar?q=${encodeURIComponent(q)}`)
+            .then(res => setAtracciones(Array.isArray(res.data) ? res.data : []))
+            .catch(err => console.error(err))
+            .finally(() => setBuscando(false))
+    }
 
     useEffect(() => {
         getFavoritos()
@@ -151,7 +166,7 @@ export default function AtraccionesPage() {
         <MainLayout>
             <div className="bg-black text-white min-h-screen p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6">
                     <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100">
                         Atracciones
                     </h1>
@@ -163,6 +178,18 @@ export default function AtraccionesPage() {
                             + Nueva
                         </button>
                     )}
+                </div>
+
+                {/* Barra de búsqueda */}
+                <div className="mb-6">
+                    <input
+                        type="text"
+                        value={busqueda}
+                        onChange={e => handleBuscar(e.target.value)}
+                        placeholder="Buscar atracción por nombre..."
+                        className="w-full max-w-md bg-zinc-900 text-white rounded-lg px-4 py-2 border border-zinc-700 focus:outline-none focus:border-zinc-400 text-sm"
+                    />
+                    {buscando && <p className="text-zinc-500 text-xs mt-1">Buscando...</p>}
                 </div>
 
                 {/* Lista */}
