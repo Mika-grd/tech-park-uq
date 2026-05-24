@@ -47,6 +47,8 @@ export default function AtraccionesPage() {
     const [favoritos, setFavoritos] = useState<string[]>([])
     const [busqueda, setBusqueda] = useState('')
     const [buscando, setBuscando] = useState(false)
+    const [filtroTipo, setFiltroTipo] = useState('')
+    const [filtroEstado, setFiltroEstado] = useState('')
 
     const [posicionFila, setPosicionFila] = useState<Record<string, number>>({})
 
@@ -192,6 +194,34 @@ export default function AtraccionesPage() {
                     {buscando && <p className="text-zinc-500 text-xs mt-1">Buscando...</p>}
                 </div>
 
+                {/* Filtros */}
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-500 uppercase tracking-widest">Tipo:</span>
+                        {['', 'MECANICA_ALTURA', 'ACUATICA', 'OTRO'].map(tipo => (
+                            <button
+                                key={tipo}
+                                onClick={() => setFiltroTipo(tipo)}
+                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroTipo === tipo ? 'bg-white text-black border-white' : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'}`}
+                            >
+                                {tipo === '' ? 'Todos' : tipo === 'MECANICA_ALTURA' ? 'Mecánica' : tipo === 'ACUATICA' ? 'Acuática' : 'Otro'}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-500 uppercase tracking-widest">Estado:</span>
+                        {['', 'ACTIVA', 'EN_MANTENIMIENTO', 'CERRADA'].map(estado => (
+                            <button
+                                key={estado}
+                                onClick={() => setFiltroEstado(estado)}
+                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroEstado === estado ? 'bg-white text-black border-white' : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'}`}
+                            >
+                                {estado === '' ? 'Todos' : estado === 'ACTIVA' ? 'Activas' : estado === 'EN_MANTENIMIENTO' ? 'Mantenimiento' : 'Cerradas'}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Lista */}
                 {loading ? (
                     <p className="text-zinc-500">Cargando...</p>
@@ -199,7 +229,10 @@ export default function AtraccionesPage() {
                     <p className="text-zinc-500">No hay atracciones registradas.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {atracciones.map(a => (
+                        {atracciones.filter(a =>
+                            (filtroTipo === '' || a.tipo === filtroTipo) &&
+                            (filtroEstado === '' || a.estado === filtroEstado)
+                        ).map(a => (
                             <div key={a.id} className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-xl font-semibold">{a.nombre}</h2>
