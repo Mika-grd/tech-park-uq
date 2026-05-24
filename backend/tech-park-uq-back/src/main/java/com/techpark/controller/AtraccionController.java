@@ -2,6 +2,7 @@ package com.techpark.controller;
 
 import com.techpark.model.Atraccion;
 import com.techpark.repository.AtraccionRepository;
+import com.techpark.service.BusquedaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,20 @@ public class AtraccionController {
     @Autowired
     private AtraccionRepository repository;
 
+    @Autowired
+    private BusquedaService busquedaService;
+
     @GetMapping
     public List<Atraccion> getAll() {
         return repository.findAll();
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Atraccion>> buscar(@RequestParam String q) {
+        if (q == null || q.isBlank()) {
+            return ResponseEntity.ok(repository.findAll());
+        }
+        return ResponseEntity.ok(busquedaService.buscar(q));
     }
 
     @PostMapping
