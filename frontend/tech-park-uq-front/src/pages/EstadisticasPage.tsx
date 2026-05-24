@@ -38,6 +38,10 @@ export default function EstadisticasPage() {
         { name: 'Otro', value: atracciones.filter(a => a.tipo === 'OTRO').length },
     ].filter(d => d.value > 0)
 
+    const topVisitantes = [...atracciones]
+        .sort((a, b) => b.visitantesAcumulados - a.visitantesAcumulados)
+        .slice(0, 5)
+
     const topCapacidad = [...atracciones]
         .sort((a, b) => b.capacidadMaxima - a.capacidadMaxima)
         .slice(0, 5)
@@ -62,11 +66,11 @@ export default function EstadisticasPage() {
                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                             <h2 className="text-lg font-semibold mb-6 tracking-wide">Visitantes acumulados</h2>
                             <ResponsiveContainer width="100%" height={250}>
-                                <BarChart data={topCapacidad}>
+                                <BarChart data={topVisitantes}>
                                     <XAxis dataKey="nombre" tick={{ fill: '#71717a', fontSize: 11 }} />
                                     <YAxis tick={{ fill: '#71717a', fontSize: 11 }} />
                                     <Tooltip contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: 8 }} />
-                                    <Bar dataKey="capacidadMaxima" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="visitantesAcumulados" fill="#22c55e" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
