@@ -3,7 +3,7 @@ import { api } from '../services/api'
 import MainLayout from '../layouts/MainLayout'
 import { getFavoritos, addFavorito, removeFavorito } from '../services/favoritosService'
 import { registrarVisita } from '../services/historialService'
-import { unirseAFila } from '../services/filaService'
+import { unirseAFila, salirDeFila } from '../services/filaService'
 import { useAuth } from '../context/AuthContext'
 
 interface Atraccion {
@@ -88,6 +88,15 @@ export default function AtraccionesPage() {
             setPosicionFila(prev => ({ ...prev, [id]: res.posicion }))
         } catch (e: any) {
             alert(e?.response?.data?.message ?? 'Error al unirse a la fila')
+        }
+    }
+
+    const handleSalirFila = async (id: string) => {
+        try {
+            await salirDeFila(id)
+            setPosicionFila(prev => { const s = { ...prev }; delete s[id]; return s })
+        } catch (e: any) {
+            alert(e?.response?.data?.message ?? 'Error al salir de la fila')
         }
     }
 
@@ -271,12 +280,21 @@ export default function AtraccionesPage() {
                                             </button>
                                         </>
                                     )}
-                                    <button
-                                        onClick={() => handleVisitar(a.id)}
-                                        className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
-                                    >
-                                        {posicionFila[a.id] ? `#${posicionFila[a.id]} en fila` : 'Visitar'}
-                                    </button>
+                                    {posicionFila[a.id] ? (
+                                        <button
+                                            onClick={() => handleSalirFila(a.id)}
+                                            className="flex-1 text-sm py-1.5 rounded-lg border border-orange-800 text-orange-400 hover:bg-orange-950 transition"
+                                        >
+                                            #{posicionFila[a.id]} — Salir
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleVisitar(a.id)}
+                                            className="flex-1 text-sm py-1.5 rounded-lg border border-blue-800 text-blue-400 hover:bg-blue-950 transition"
+                                        >
+                                            Visitar
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
