@@ -100,7 +100,6 @@ export default function AtraccionesPage() {
         }
     }
 
-
     const cargarAtracciones = () => {
         setLoading(true)
         api.get('/atracciones')
@@ -172,19 +171,18 @@ export default function AtraccionesPage() {
             .catch(err => console.error(err))
     }
 
-
     return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen p-8">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100">
+                    <h1 className="font-['Ghastly_Panic'] text-4xl font-bold tracking-widest uppercase text-white">
                         Atracciones
                     </h1>
                     {puedeEditar && (
                         <button
                             onClick={abrirNuevo}
-                            className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-zinc-300 transition"
+                            className="bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-white transition"
                         >
                             + Nueva
                         </button>
@@ -198,32 +196,32 @@ export default function AtraccionesPage() {
                         value={busqueda}
                         onChange={e => handleBuscar(e.target.value)}
                         placeholder="Buscar atracción por nombre..."
-                        className="w-full max-w-md bg-zinc-900 text-white rounded-lg px-4 py-2 border border-zinc-700 focus:outline-none focus:border-zinc-400 text-sm"
+                        className="w-full max-w-md bg-black text-white rounded-lg px-4 py-2 border border-white focus:outline-none focus:border-white text-sm"
                     />
-                    {buscando && <p className="text-zinc-500 text-xs mt-1">Buscando...</p>}
+                    {buscando && <p className="text-white text-xs mt-1">Buscando...</p>}
                 </div>
 
                 {/* Filtros */}
                 <div className="flex flex-wrap items-center gap-4 mb-6">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-zinc-500 uppercase tracking-widest">Tipo:</span>
+                        <span className="text-xs text-white uppercase tracking-widest">Tipo:</span>
                         {['', 'MECANICA_ALTURA', 'ACUATICA', 'OTRO'].map(tipo => (
                             <button
                                 key={tipo}
                                 onClick={() => setFiltroTipo(tipo)}
-                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroTipo === tipo ? 'bg-white text-black border-white' : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'}`}
+                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroTipo === tipo ? 'bg-white text-black border-white' : 'border-white text-white hover:bg-white hover:text-black'}`}
                             >
                                 {tipo === '' ? 'Todos' : tipo === 'MECANICA_ALTURA' ? 'Mecánica' : tipo === 'ACUATICA' ? 'Acuática' : 'Otro'}
                             </button>
                         ))}
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-zinc-500 uppercase tracking-widest">Estado:</span>
+                        <span className="text-xs text-white uppercase tracking-widest">Estado:</span>
                         {['', 'ACTIVA', 'EN_MANTENIMIENTO', 'CERRADA'].map(estado => (
                             <button
                                 key={estado}
                                 onClick={() => setFiltroEstado(estado)}
-                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroEstado === estado ? 'bg-white text-black border-white' : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'}`}
+                                className={`text-xs px-3 py-1.5 rounded-lg border transition ${filtroEstado === estado ? 'bg-white text-black border-white' : 'border-white text-white hover:bg-white hover:text-black'}`}
                             >
                                 {estado === '' ? 'Todos' : estado === 'ACTIVA' ? 'Activas' : estado === 'EN_MANTENIMIENTO' ? 'Mantenimiento' : 'Cerradas'}
                             </button>
@@ -233,33 +231,33 @@ export default function AtraccionesPage() {
 
                 {/* Lista */}
                 {loading ? (
-                    <p className="text-zinc-500">Cargando...</p>
+                    <p className="text-white">Cargando...</p>
                 ) : atracciones.length === 0 ? (
-                    <p className="text-zinc-500">No hay atracciones registradas.</p>
+                    <p className="text-white">No hay atracciones registradas.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {atracciones.filter(a =>
                             (filtroTipo === '' || a.tipo === filtroTipo) &&
                             (filtroEstado === '' || a.estado === filtroEstado)
                         ).map(a => (
-                            <div key={a.id} className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
+                            <div key={a.id} className="bg-black rounded-xl p-6 border border-white">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-xl font-semibold">{a.nombre}</h2>
+                                    <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">{a.nombre}</h2>
                                     <span className={`text-xs px-2 py-1 rounded-full text-black font-bold ${colorEstado(a.estado)}`}>
                                         {a.estado}
                                     </span>
                                 </div>
-                                <p className="text-zinc-400 text-sm mb-1">Tipo: {a.tipo}</p>
-                                <p className="text-zinc-400 text-sm mb-1">Capacidad: {a.capacidadMaxima}</p>
-                                <p className="text-zinc-400 text-sm mb-1">Altura mínima: {a.alturaMinima}cm</p>
-                                <p className="text-zinc-400 text-sm mb-1">Edad mínima: {a.edadMinima} años</p>
-                                <p className="text-zinc-400 text-sm mb-4">⏱ Espera: {a.tiempoEspera} min</p>
+                                <p className="text-white text-sm mb-1">Tipo: {a.tipo}</p>
+                                <p className="text-white text-sm mb-1">Capacidad: {a.capacidadMaxima}</p>
+                                <p className="text-white text-sm mb-1">Altura mínima: {a.alturaMinima}cm</p>
+                                <p className="text-white text-sm mb-1">Edad mínima: {a.edadMinima} años</p>
+                                <p className="text-white text-sm mb-4">⏱ Espera: {a.tiempoEspera} min</p>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => toggleFavorito(a.id)}
                                         className={`flex-1 text-sm py-1.5 rounded-lg border transition ${favoritos.includes(a.id)
                                             ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-950'
-                                            : 'border-zinc-600 text-zinc-400 hover:bg-zinc-800'
+                                            : 'border-white text-white hover:bg-white hover:text-black'
                                             }`}
                                     >
                                         {favoritos.includes(a.id) ? '★ Favorito' : '☆ Favorito'}
@@ -268,7 +266,7 @@ export default function AtraccionesPage() {
                                         <>
                                             <button
                                                 onClick={() => abrirEditar(a)}
-                                                className="flex-1 text-sm py-1.5 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition"
+                                                className="flex-1 text-sm py-1.5 rounded-lg border border-white text-white hover:bg-white hover:text-black transition"
                                             >
                                                 Editar
                                             </button>
@@ -304,8 +302,8 @@ export default function AtraccionesPage() {
                 {/* Modal */}
                 {modalAbierto && (
                     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                        <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 w-full max-w-lg">
-                            <h2 className="text-2xl font-bold mb-6 tracking-wide">
+                        <div className="bg-black border border-white rounded-2xl p-8 w-full max-w-lg">
+                            <h2 className="font-['Ghastly_Panic'] text-3xl font-bold mb-6 tracking-wide">
                                 {editando ? 'Editar Atracción' : 'Nueva Atracción'}
                             </h2>
 
@@ -320,22 +318,22 @@ export default function AtraccionesPage() {
                                     { label: 'Tiempo de espera (min)', name: 'tiempoEspera', type: 'number' },
                                 ].map(campo => (
                                     <div key={campo.name}>
-                                        <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>
+                                        <label className="text-white text-xs mb-1 block">{campo.label}</label>
                                         <input
                                             type={campo.type}
                                             name={campo.name}
                                             value={(form as any)[campo.name]}
                                             onChange={handleChange}
                                             disabled={editando && campo.name === 'id'}
-                                            className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400 disabled:opacity-50"
+                                            className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none focus:border-white disabled:opacity-50"
                                         />
                                     </div>
                                 ))}
 
                                 <div>
-                                    <label className="text-xs text-zinc-400 mb-1 block">Tipo</label>
+                                    <label className="text-white text-xs mb-1 block">Tipo</label>
                                     <select name="tipo" value={form.tipo} onChange={handleChange}
-                                        className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none">
+                                        className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none">
                                         <option value="MECANICA_ALTURA">Mecánica de altura</option>
                                         <option value="ACUATICA">Acuática</option>
                                         <option value="OTRO">Otro</option>
@@ -343,9 +341,9 @@ export default function AtraccionesPage() {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs text-zinc-400 mb-1 block">Estado</label>
+                                    <label className="text-white text-xs mb-1 block">Estado</label>
                                     <select name="estado" value={form.estado} onChange={handleChange}
-                                        className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none">
+                                        className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none">
                                         <option value="ACTIVA">Activa</option>
                                         <option value="EN_MANTENIMIENTO">En mantenimiento</option>
                                         <option value="CERRADA">Cerrada</option>
@@ -355,11 +353,11 @@ export default function AtraccionesPage() {
 
                             <div className="flex justify-end gap-3 mt-6">
                                 <button onClick={() => { setModalAbierto(false); setForm(estadoInicial) }}
-                                    className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition text-sm">
+                                    className="px-4 py-2 rounded-lg border border-white text-white hover:bg-white hover:text-black transition text-sm">
                                     Cancelar
                                 </button>
                                 <button onClick={handleGuardar} disabled={guardando}
-                                    className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50">
+                                    className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-white transition text-sm disabled:opacity-50">
                                     {guardando ? 'Guardando...' : 'Guardar'}
                                 </button>
                             </div>

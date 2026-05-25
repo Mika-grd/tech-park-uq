@@ -137,7 +137,7 @@ export default function AdminPage() {
     <MainLayout>
       <main className="bg-black min-h-screen text-white relative">
         {usuario?.nombre && (
-          <p className="absolute top-6 left-8 text-sm text-zinc-400 tracking-widest uppercase">
+          <p className="absolute top-6 left-8 text-sm text-white tracking-widest uppercase">
             Bienvenido, {usuario.nombre}
           </p>
         )}
@@ -145,87 +145,87 @@ export default function AdminPage() {
         {/* Hero */}
         <div className="flex items-center justify-center py-24 px-6">
           <div className="text-center">
-            <h1 className="font-['Metal_Mania'] text-7xl md:text-[10rem] uppercase tracking-[0.12em] text-zinc-100 leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+            <h1 className="font-['Ghastly_Panic'] text-7xl md:text-[10rem] uppercase tracking-[0.12em] text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
               tech-park-uq
             </h1>
-            <p className="font-['Inter'] mt-6 text-sm md:text-base tracking-[0.35em] uppercase text-zinc-500">
+            <p className="mt-6 text-sm md:text-base tracking-[0.35em] uppercase text-white">
               Sistema de gestión del parque
             </p>
 
-            {/* Acceso rápido a atracciones y herramientas dev */}
             <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              to="/atracciones"
-              className="inline-block px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-zinc-300 transition tracking-widest text-sm uppercase"
-            >
-              Ver Atracciones
-            </Link>
+              <Link
+                to="/atracciones"
+                className="inline-block px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-white transition tracking-widest text-sm uppercase"
+              >
+                Ver Atracciones
+              </Link>
 
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              className="px-6 py-3 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 transition tracking-widest text-xs uppercase disabled:opacity-50"
-            >
-              {seeding ? 'Cargando datos…' : 'Cargar datos demo (seed)'}
-            </button>
-            {seedMsg && <p className="text-xs text-zinc-400 max-w-xl break-words">{seedMsg}</p>}
+              <button
+                onClick={handleSeed}
+                disabled={seeding}
+                className="px-6 py-3 rounded-lg border border-white bg-black text-white hover:bg-white hover:text-black transition tracking-widest text-xs uppercase disabled:opacity-50"
+              >
+                {seeding ? 'Cargando datos…' : 'Cargar datos demo (seed)'}
+              </button>
+              {seedMsg && <p className="text-xs text-white max-w-xl break-words">{seedMsg}</p>}
 
-            <button
-              onClick={handleClearDb}
-              disabled={clearing}
-              className="px-6 py-3 rounded-lg border border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-950/70 transition tracking-widest text-xs uppercase disabled:opacity-50"
-              title="Borra todas las tablas (solo dev)"
-            >
-              {clearing ? 'Limpiando…' : 'Clear DB (dev)'}
-            </button>
-            {clearMsg && <p className="text-xs text-zinc-400 max-w-xl break-words">{clearMsg}</p>}
+              <button
+                onClick={handleClearDb}
+                disabled={clearing}
+                className="px-6 py-3 rounded-lg border border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-950/70 transition tracking-widest text-xs uppercase disabled:opacity-50"
+                title="Borra todas las tablas (solo dev)"
+              >
+                {clearing ? 'Limpiando…' : 'Clear DB (dev)'}
+              </button>
+              {clearMsg && <p className="text-xs text-white max-w-xl break-words">{clearMsg}</p>}
             </div>
           </div>
         </div>
 
         {/* Tarjetas de gestión */}
         <div className="max-w-5xl mx-auto px-8 grid gap-6 sm:grid-cols-2">
-            <button
-              onClick={() => { setModalAdmin(true); setAdminMsg(null) }}
-              className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-left hover:border-zinc-600 hover:bg-zinc-900 transition w-full"
-            >
-              <h2 className="text-xl font-semibold text-white">Gestión de Administradores</h2>
-              <p className="mt-2 text-zinc-400">Registra nuevos administradores.</p>
-            </button>
+          <button
+            onClick={() => { setModalAdmin(true); setAdminMsg(null) }}
+            className="rounded-3xl border border-white bg-black p-6 text-left hover:bg-white hover:text-black transition w-full"
+          >
+            <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Gestión de Administradores</h2>
+            <p className="mt-2">Registra nuevos administradores.</p>
+          </button>
 
-            <button
-              onClick={() => { setModalOperador(true); setOperadorMsg(null) }}
-              className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-left hover:border-zinc-600 hover:bg-zinc-900 transition w-full"
-            >
-              <h2 className="text-xl font-semibold text-white">Gestión de Operadores</h2>
-              <p className="mt-2 text-zinc-400">Registra nuevos operadores y asígnalos a una zona.</p>
-            </button>
+          <button
+            onClick={() => { setModalOperador(true); setOperadorMsg(null) }}
+            className="rounded-3xl border border-white bg-black p-6 text-left hover:bg-white hover:text-black transition w-full"
+          >
+            <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Gestión de Operadores</h2>
+            <p className="mt-2">Registra nuevos operadores y asígnalos a una zona.</p>
+          </button>
 
-            <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
-              <h2 className="text-xl font-semibold text-white">Reportes</h2>
-              <p className="mt-2 text-zinc-400">Consulta ingresos, visitantes y alertas de mantenimiento.</p>
-            </article>
+          <article className="rounded-3xl border border-white bg-black p-6">
+            <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Reportes</h2>
+            <p className="mt-2">Consulta ingresos, visitantes y alertas de mantenimiento.</p>
+          </article>
         </div>
 
         {/* Stats */}
         <div className="max-w-5xl mx-auto px-8 mt-10 pb-16 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Total', value: total, color: 'border-zinc-600' },
-              { label: 'Activas', value: activas, color: 'border-green-600' },
-              { label: 'Mantenimiento', value: mantenimiento, color: 'border-yellow-600' },
-              { label: 'Cerradas', value: cerradas, color: 'border-red-600' },
-            ].map(stat => (
-              <div key={stat.label} className={`bg-zinc-900 border ${stat.color} rounded-xl p-6 text-center`}>
-                <p className="text-4xl font-bold text-white">{stat.value}</p>
-                <p className="text-xs text-zinc-500 uppercase tracking-widest mt-2">{stat.label}</p>
-              </div>
-            ))}
+          {[
+            { label: 'Total', value: total, color: 'border-white' },
+            { label: 'Activas', value: activas, color: 'border-green-600' },
+            { label: 'Mantenimiento', value: mantenimiento, color: 'border-yellow-600' },
+            { label: 'Cerradas', value: cerradas, color: 'border-red-600' },
+          ].map(stat => (
+            <div key={stat.label} className={`bg-black border ${stat.color} rounded-xl p-6 text-center`}>
+              <p className="text-4xl font-bold text-white">{stat.value}</p>
+              <p className="text-xs text-white uppercase tracking-widest mt-2">{stat.label}</p>
+            </div>
+          ))}
         </div>
 
+        {/* Modal Admin */}
         {modalAdmin && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 w-full max-w-md">
-              <h2 className="text-2xl font-bold mb-6 tracking-wide">Nuevo Administrador</h2>
+            <div className="bg-black border border-white rounded-2xl p-8 w-full max-w-md">
+              <h2 className="font-['Ghastly_Panic'] text-3xl font-bold mb-6 tracking-wide">Nuevo Administrador</h2>
 
               <div className="flex flex-col gap-4">
                 {[
@@ -234,13 +234,13 @@ export default function AdminPage() {
                   { label: 'Contraseña (mín. 8 caracteres)', name: 'password', type: 'password' },
                 ].map(campo => (
                   <div key={campo.name}>
-                    <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>
+                    <label className="text-xs text-white mb-1 block">{campo.label}</label>
                     <input
                       type={campo.type}
                       name={campo.name}
                       value={(adminForm as any)[campo.name]}
                       onChange={e => setAdminForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}
-                      className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                      className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none focus:border-white"
                     />
                   </div>
                 ))}
@@ -255,14 +255,14 @@ export default function AdminPage() {
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => { setModalAdmin(false); setAdminForm(adminFormInicial); setAdminMsg(null) }}
-                  className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition text-sm"
+                  className="px-4 py-2 rounded-lg border border-white text-white hover:bg-white hover:text-black transition text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleCrearAdmin}
                   disabled={guardandoAdmin}
-                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-white transition text-sm disabled:opacity-50"
                 >
                   {guardandoAdmin ? 'Guardando...' : 'Guardar'}
                 </button>
@@ -271,10 +271,11 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* Modal Operador */}
         {modalOperador && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 w-full max-w-md">
-              <h2 className="text-2xl font-bold mb-6 tracking-wide">Nuevo Operador</h2>
+            <div className="bg-black border border-white rounded-2xl p-8 w-full max-w-md">
+              <h2 className="font-['Ghastly_Panic'] text-3xl font-bold mb-6 tracking-wide">Nuevo Operador</h2>
 
               <div className="flex flex-col gap-4">
                 {[
@@ -284,13 +285,13 @@ export default function AdminPage() {
                   { label: 'Zona asignada (opcional)', name: 'zonaAsignada', type: 'text' },
                 ].map(campo => (
                   <div key={campo.name}>
-                    <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>
+                    <label className="text-xs text-white mb-1 block">{campo.label}</label>
                     <input
                       type={campo.type}
                       name={campo.name}
                       value={(operadorForm as any)[campo.name]}
                       onChange={e => setOperadorForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}
-                      className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                      className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none focus:border-white"
                     />
                   </div>
                 ))}
@@ -305,14 +306,14 @@ export default function AdminPage() {
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => { setModalOperador(false); setOperadorForm(operadorFormInicial); setOperadorMsg(null) }}
-                  className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition text-sm"
+                  className="px-4 py-2 rounded-lg border border-white text-white hover:bg-white hover:text-black transition text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleCrearOperador}
                   disabled={guardandoOperador}
-                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-white transition text-sm disabled:opacity-50"
                 >
                   {guardandoOperador ? 'Guardando...' : 'Guardar'}
                 </button>

@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useTitle } from '../../hooks/useTitle'
 
 const inputClass =
-  'rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-zinc-600'
+  'rounded-lg border border-white bg-black px-3 py-2 text-white outline-none focus:border-white'
 
 export default function RegisterPage() {
   useTitle('Registro · tech-park-uq')
@@ -42,11 +42,10 @@ export default function RegisterPage() {
       setError('Indica una estatura válida (metros o cm según convención del parque).')
       return
     }
-  // saldoVirtual is not allowed to be set at registration; backend will default to 0
 
     setSubmitting(true)
     try {
-  await registerUser({
+      await registerUser({
         nombre: nombre.trim(),
         email: email.trim(),
         password,
@@ -81,11 +80,11 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col justify-center py-12">
-      <h1 className="font-['Metal_Mania'] text-3xl tracking-wider text-zinc-100">Crear cuenta</h1>
-      <p className="mt-2 text-sm text-zinc-500">Registro como visitante del parque.</p>
+      <h1 className="font-['Ghastly_Panic'] text-5xl tracking-wider text-white">Crear cuenta</h1>
+      <p className="mt-2 text-sm text-white">Registro como visitante del parque.</p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
+        <label className="flex flex-col gap-1 text-sm text-white">
           Nombre
           <input
             type="text"
@@ -96,7 +95,7 @@ export default function RegisterPage() {
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
+        <label className="flex flex-col gap-1 text-sm text-white">
           Correo
           <input
             type="email"
@@ -107,7 +106,7 @@ export default function RegisterPage() {
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
+        <label className="flex flex-col gap-1 text-sm text-white">
           Documento
           <input
             type="text"
@@ -119,7 +118,7 @@ export default function RegisterPage() {
           />
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-sm text-zinc-400">
+          <label className="flex flex-col gap-1 text-sm text-white">
             Edad
             <input
               type="number"
@@ -130,7 +129,7 @@ export default function RegisterPage() {
               className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-400">
+          <label className="flex flex-col gap-1 text-sm text-white">
             Estatura
             <input
               type="number"
@@ -143,7 +142,7 @@ export default function RegisterPage() {
             />
           </label>
         </div>
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
+        <label className="flex flex-col gap-1 text-sm text-white">
           Contraseña
           <input
             type="password"
@@ -154,7 +153,7 @@ export default function RegisterPage() {
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-zinc-400">
+        <label className="flex flex-col gap-1 text-sm text-white">
           Confirmar contraseña
           <input
             type="password"
@@ -169,15 +168,15 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-2 rounded-lg bg-zinc-100 px-4 py-2 font-medium text-zinc-950 disabled:opacity-50"
+          className="mt-2 rounded-lg bg-white px-4 py-2 font-bold text-black disabled:opacity-50"
         >
           {submitting ? 'Creando cuenta…' : 'Registrarse'}
         </button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-zinc-500">
+      <p className="mt-8 text-center text-sm text-white">
         ¿Ya tienes cuenta?{' '}
-        <Link to="/auth/login" className="text-zinc-300 underline-offset-4 hover:underline">
+        <Link to="/auth/login" className="text-white underline-offset-4 hover:underline">
           Iniciar sesión
         </Link>
       </p>

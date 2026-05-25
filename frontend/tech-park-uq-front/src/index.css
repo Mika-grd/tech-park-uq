@@ -1,5 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Metal+Mania&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap');
 
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Ghastly Panic';
+  src: url('/fonts/Ghastly Panic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
+@layer base {
+  * {
+    font-family: 'Metal Mania', cursive;
+  }
+}

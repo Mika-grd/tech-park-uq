@@ -146,12 +146,12 @@ export default function PerfilPage() {
         } finally {
             setAdding(false)
         }
-
     }
+
     if (loading) return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen flex items-center justify-center">
-                <p className="text-zinc-500">Cargando perfil...</p>
+                <p className="text-white">Cargando perfil...</p>
             </div>
         </MainLayout>
     )
@@ -159,21 +159,21 @@ export default function PerfilPage() {
     return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen p-8">
-                <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100 mb-8">
+                <h1 className="font-['Ghastly_Panic'] text-4xl font-bold tracking-widest uppercase text-white mb-8">
                     Mi Perfil
                 </h1>
 
                 <div className="max-w-2xl grid grid-cols-1 gap-6">
 
                     {/* Tarjeta principal */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                    <div className="bg-black border border-white rounded-2xl p-8">
                         <div className="flex items-center gap-6 mb-6">
-                            <div className="w-16 h-16 rounded-full bg-zinc-700 flex items-center justify-center text-2xl font-bold">
+                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-2xl font-bold text-black">
                                 {perfil?.nombre?.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <h2 className="text-2xl font-semibold">{perfil?.nombre}</h2>
-                                <span className="text-xs bg-zinc-700 text-zinc-300 px-2 py-1 rounded-full uppercase tracking-widest">
+                                <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">{perfil?.nombre}</h2>
+                                <span className="text-xs bg-white text-black px-2 py-1 rounded-full uppercase tracking-widest">
                                     {perfil?.rol}
                                 </span>
                             </div>
@@ -186,8 +186,8 @@ export default function PerfilPage() {
                                 { label: 'Edad', value: perfil?.edad ? `${perfil.edad} años` : '—' },
                                 { label: 'Estatura', value: perfil?.estatura ? `${perfil.estatura} cm` : '—' },
                             ].map(item => (
-                                <div key={item.label} className="bg-zinc-800 rounded-xl p-4">
-                                    <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">{item.label}</p>
+                                <div key={item.label} className="bg-black border border-white rounded-xl p-4">
+                                    <p className="text-xs text-white uppercase tracking-widest mb-1">{item.label}</p>
                                     <p className="text-white font-medium">{item.value}</p>
                                 </div>
                             ))}
@@ -196,10 +196,10 @@ export default function PerfilPage() {
 
                     {/* Saldo virtual */}
                     {(perfil?.rol === 'Visitante' || perfil?.saldoVirtual !== undefined) && (
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+                        <div className="bg-black border border-white rounded-2xl p-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">Saldo Virtual</p>
+                                    <p className="text-xs text-white uppercase tracking-widest mb-2">Saldo Virtual</p>
                                     <p className="text-4xl font-bold text-green-400">
                                         ${((perfil?.saldoVirtual ?? 0)).toLocaleString()}
                                     </p>
@@ -213,7 +213,7 @@ export default function PerfilPage() {
                                         placeholder="Monto a agregar"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-40 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none"
+                                        className="w-40 rounded-lg border border-white bg-black px-3 py-2 text-white outline-none"
                                     />
                                     <button
                                         onClick={handleAddSaldo}
@@ -231,27 +231,27 @@ export default function PerfilPage() {
                     )}
 
                     {/* Ticket */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-                        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Mi Ticket</p>
+                    <div className="bg-black border border-white rounded-2xl p-8">
+                        <p className="text-xs text-white uppercase tracking-widest mb-4">Mi Ticket</p>
                         {ticket ? (
                             <div className="flex items-center justify-between">
                                 <div>
                                     <span className={`text-sm font-bold px-3 py-1 rounded-full ${
                                         ticket.tipo === 'FAST_PASS' ? 'bg-purple-600 text-white' :
                                         ticket.tipo === 'FAMILIAR' ? 'bg-blue-600 text-white' :
-                                        'bg-zinc-600 text-white'
+                                        'bg-white text-black'
                                     }`}>
                                         {ticket.tipo.replace('_', ' ')}
                                     </span>
-                                    <p className="text-zinc-400 text-xs mt-2">
+                                    <p className="text-white text-xs mt-2">
                                         Comprado el {new Date(ticket.fechaCompra).toLocaleDateString()}
                                     </p>
-                                    <p className="text-zinc-400 text-xs">Precio: ${ticket.precio.toLocaleString()}</p>
+                                    <p className="text-white text-xs">Precio: ${ticket.precio.toLocaleString()}</p>
                                 </div>
                                 <button
                                     onClick={() => handleComprarTicket(ticket.tipo)}
                                     disabled={comprandoTicket}
-                                    className="text-xs border border-zinc-600 text-zinc-400 px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition disabled:opacity-50"
+                                    className="text-xs border border-white text-white px-3 py-1.5 rounded-lg hover:bg-white hover:text-black transition disabled:opacity-50"
                                 >
                                     Renovar
                                 </button>
@@ -259,7 +259,7 @@ export default function PerfilPage() {
                         ) : (
                             <div className="grid grid-cols-3 gap-3">
                                 {([
-                                    { tipo: 'GENERAL' as TipoTicket, precio: 50000, color: 'border-zinc-600 hover:bg-zinc-800' },
+                                    { tipo: 'GENERAL' as TipoTicket, precio: 50000, color: 'border-white hover:bg-white hover:text-black' },
                                     { tipo: 'FAMILIAR' as TipoTicket, precio: 35000, color: 'border-blue-700 hover:bg-blue-950' },
                                     { tipo: 'FAST_PASS' as TipoTicket, precio: 80000, color: 'border-purple-700 hover:bg-purple-950' },
                                 ]).map(({ tipo, precio, color }) => (
@@ -270,7 +270,7 @@ export default function PerfilPage() {
                                         className={`flex flex-col items-center gap-1 border rounded-xl p-4 transition disabled:opacity-50 ${color}`}
                                     >
                                         <span className="text-sm font-bold text-white">{tipo.replace('_', ' ')}</span>
-                                        <span className="text-xs text-zinc-400">${precio.toLocaleString()}</span>
+                                        <span className="text-xs text-white">${precio.toLocaleString()}</span>
                                     </button>
                                 ))}
                             </div>
@@ -284,17 +284,18 @@ export default function PerfilPage() {
                     >
                         Cerrar sesión
                     </button>
+
                     {/* Favoritos */}
                     {favoritos.length > 0 && (
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Atracciones Favoritas</p>
+                        <div className="bg-black border border-white rounded-2xl p-8">
+                            <p className="text-xs text-white uppercase tracking-widest mb-4">Atracciones Favoritas</p>
                             <div className="flex flex-wrap gap-2">
                                 {favoritos.map(id => (
-                                    <div key={id} className="flex items-center gap-2 bg-zinc-800 rounded-lg px-3 py-2">
+                                    <div key={id} className="flex items-center gap-2 bg-black border border-white rounded-lg px-3 py-2">
                                         <span className="text-sm text-yellow-400">★ {nombresAtracciones[id] ?? id}</span>
                                         <button
                                             onClick={() => handleRemoveFavorito(id)}
-                                            className="text-zinc-500 hover:text-red-400 text-xs"
+                                            className="text-white hover:text-red-400 text-xs"
                                         >
                                             ✕
                                         </button>
@@ -303,15 +304,16 @@ export default function PerfilPage() {
                             </div>
                         </div>
                     )}
+
                     {/* Historial */}
                     {historial.length > 0 && (
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-                            <p className="text-xs text-zinc-500 uppercase tracking-widest mb-4">Historial de Visitas</p>
+                        <div className="bg-black border border-white rounded-2xl p-8">
+                            <p className="text-xs text-white uppercase tracking-widest mb-4">Historial de Visitas</p>
                             <div className="flex flex-col gap-2">
                                 {historial.map((id, index) => (
-                                    <div key={index} className="flex items-center gap-3 bg-zinc-800 rounded-lg px-3 py-2">
-                                        <span className="text-zinc-500 text-xs w-5">{index + 1}</span>
-                                        <span className="text-sm text-zinc-300">{nombresAtracciones[id] ?? id}</span>
+                                    <div key={index} className="flex items-center gap-3 bg-black border border-white rounded-lg px-3 py-2">
+                                        <span className="text-white text-xs w-5">{index + 1}</span>
+                                        <span className="text-sm text-white">{nombresAtracciones[id] ?? id}</span>
                                     </div>
                                 ))}
                             </div>

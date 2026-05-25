@@ -38,7 +38,6 @@ export default function MapaPage() {
         }
     }
 
-
     useEffect(() => {
         api.get('/atracciones')
             .then(res => setAtracciones(Array.isArray(res.data) ? res.data : []))
@@ -53,7 +52,6 @@ export default function MapaPage() {
 
         d3.select(svgRef.current).selectAll('*').remove()
 
-        // Orden fijo por ID (mismo que el backend)
         const sorted = [...atracciones].sort((a, b) => String(a.id).localeCompare(String(b.id)))
         const n = sorted.length
         const cols = Math.ceil(Math.sqrt(n))
@@ -63,14 +61,12 @@ export default function MapaPage() {
         const cellW = cols > 1 ? (width - padX * 2) / (cols - 1) : 0
         const cellH = rows > 1 ? (height - padY * 2) / (rows - 1) : 0
 
-        // Jitter determinístico basado en el ID (siempre el mismo resultado)
         const hashJitter = (id: string, seed: number, scale: number) => {
             let h = seed
             for (const c of id) h = Math.imul(h * 31 + c.charCodeAt(0), 1) | 0
             return ((h & 0xffff) / 0xffff - 0.5) * scale
         }
 
-        // Posiciones en grid escalonado (filas impares desplazadas)
         const posMap = new Map<string, { x: number, y: number }>()
         sorted.forEach((a, i) => {
             const col = i % cols
@@ -82,7 +78,6 @@ export default function MapaPage() {
             })
         })
 
-        // Aristas: vecino derecho + vecino de abajo (mismo grid que el backend)
         const aristas: Arista[] = []
         sorted.forEach((a, i) => {
             const col = i % cols
@@ -117,13 +112,12 @@ export default function MapaPage() {
         svg.on('dblclick', () =>
             svg.transition().duration(250).call(zoom.transform as any, d3.zoomIdentity))
 
-        // Aristas como curvas suaves
         root.append('g')
             .selectAll('path')
             .data(aristas)
             .enter().append('path')
             .attr('fill', 'none')
-            .attr('stroke', d => esEnRuta(d.source, d.target) ? '#00ffff' : '#52525b')
+            .attr('stroke', d => esEnRuta(d.source, d.target) ? '#00ffff' : '#ffffff')
             .attr('stroke-width', d => esEnRuta(d.source, d.target) ? 5 : 2)
             .attr('opacity', d => esEnRuta(d.source, d.target) ? 1 : 0.6)
             .attr('stroke-linecap', 'round')
@@ -135,7 +129,6 @@ export default function MapaPage() {
                 return `M${s.x},${s.y} Q${cx},${cy} ${t.x},${t.y}`
             })
 
-        // Nodos
         const nodeG = root.append('g')
             .selectAll('g')
             .data(sorted)
@@ -145,7 +138,6 @@ export default function MapaPage() {
                 return `translate(${p.x},${p.y})`
             })
 
-        // Anillo de ruta
         nodeG.append('circle')
             .attr('r', 36)
             .attr('fill', 'none')
@@ -156,7 +148,7 @@ export default function MapaPage() {
             .attr('r', 26)
             .attr('fill', d => colorNodo(d.estado))
             .attr('opacity', 0.9)
-            .attr('stroke', '#52525b')
+            .attr('stroke', '#ffffff')
             .attr('stroke-width', 2)
 
         nodeG.append('text')
@@ -171,9 +163,8 @@ export default function MapaPage() {
             .attr('dy', 42)
             .attr('fill', 'white')
             .attr('font-size', '11px')
-            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-family', 'Metal Mania, cursive')
 
-        // Badge numerado para nodos en la ruta
         const rutaNodeG = nodeG.filter(d => ruta.includes(d.id))
         rutaNodeG.append('circle')
             .attr('r', 12)
@@ -189,7 +180,7 @@ export default function MapaPage() {
             .attr('fill', '#000')
             .attr('font-size', '11px')
             .attr('font-weight', 'bold')
-            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-family', 'Metal Mania, cursive')
 
     }, [atracciones, ruta])
 
@@ -202,7 +193,7 @@ export default function MapaPage() {
     return (
         <MainLayout>
             <div className="bg-black text-white min-h-screen p-8">
-                <h1 className="text-4xl font-bold tracking-widest uppercase text-zinc-100 mb-8">
+                <h1 className="font-['Ghastly_Panic'] text-4xl font-bold tracking-widest uppercase text-white mb-8">
                     Mapa del Parque
                 </h1>
 
@@ -215,19 +206,19 @@ export default function MapaPage() {
                     ].map(l => (
                         <div key={l.label} className="flex items-center gap-2">
                             <span className={`w-3 h-3 rounded-full ${l.color}`} />
-                            <span className="text-xs text-zinc-400 uppercase tracking-widest">{l.label}</span>
+                            <span className="text-xs text-white uppercase tracking-widest">{l.label}</span>
                         </div>
                     ))}
                 </div>
 
                 {/* Selector de ruta */}
-                <div className="flex flex-wrap items-end gap-4 mb-6 bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                <div className="flex flex-wrap items-end gap-4 mb-6 bg-black border border-white rounded-2xl p-5">
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-zinc-500 uppercase tracking-widest">Origen</label>
+                        <label className="text-xs text-white uppercase tracking-widest">Origen</label>
                         <select
                             value={origen}
                             onChange={e => setOrigen(e.target.value)}
-                            className="bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                            className="bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none focus:border-white"
                         >
                             <option value="">Selecciona una atracción</option>
                             {atracciones.map(a => (
@@ -236,11 +227,11 @@ export default function MapaPage() {
                         </select>
                     </div>
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-zinc-500 uppercase tracking-widest">Destino</label>
+                        <label className="text-xs text-white uppercase tracking-widest">Destino</label>
                         <select
                             value={destino}
                             onChange={e => setDestino(e.target.value)}
-                            className="bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                            className="bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none focus:border-white"
                         >
                             <option value="">Selecciona una atracción</option>
                             {atracciones.map(a => (
@@ -258,7 +249,7 @@ export default function MapaPage() {
                     {ruta.length > 0 && (
                         <button
                             onClick={() => { setRuta([]); setOrigen(''); setDestino('') }}
-                            className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition text-sm"
+                            className="px-4 py-2 rounded-lg border border-white text-white hover:bg-white hover:text-black transition text-sm"
                         >
                             Limpiar
                         </button>
@@ -272,20 +263,20 @@ export default function MapaPage() {
                 </div>
 
                 {/* Grafo */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden" style={{ height: '680px' }}>
+                <div className="bg-black border border-white rounded-2xl overflow-hidden" style={{ height: '680px' }}>
                     <svg ref={svgRef} className="w-full h-full" />
                 </div>
 
-                <p className="text-xs text-zinc-500 mt-3 tracking-widest uppercase">
+                <p className="text-xs text-white mt-3 tracking-widest uppercase">
                     Tip: rueda del mouse para zoom • arrastra para mover • doble click para reset
                 </p>
 
                 {/* Lista */}
                 <div className="mt-6 flex flex-wrap gap-3">
                     {atracciones.map(a => (
-                        <div key={a.id} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2">
+                        <div key={a.id} className="flex items-center gap-2 bg-black border border-white rounded-lg px-3 py-2">
                             <span className={`w-2 h-2 rounded-full ${colorEstado(a.estado)}`} />
-                            <span className="text-sm text-zinc-300">{a.nombre}</span>
+                            <span className="text-sm text-white">{a.nombre}</span>
                         </div>
                     ))}
                 </div>

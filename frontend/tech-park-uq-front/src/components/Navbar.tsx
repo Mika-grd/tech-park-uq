@@ -23,8 +23,8 @@ export default function Navbar() {
     )
 
     return (
-        <nav className="bg-zinc-950 border-b border-zinc-800 px-8 py-4 flex items-center justify-between">
-            <span className="font-['Metal_Mania'] text-xl text-white tracking-widest">
+        <nav className="bg-black border-b border-white px-8 py-4 flex items-center justify-between">
+            <span className="font-['Ghastly_Panic'] text-3xl text-white tracking-widest">
                 TECH-PARK-UQ
             </span>
 
@@ -34,8 +34,8 @@ export default function Navbar() {
                         <Link
                             to={link.path}
                             className={`text-sm tracking-widest uppercase transition ${pathname === link.path
-                                ? 'text-white font-bold'
-                                : 'text-zinc-500 hover:text-white'
+                                ? 'text-white font-bold underline underline-offset-4'
+                                : 'text-white hover:underline hover:underline-offset-4'
                                 }`}
                         >
                             {link.label}
@@ -47,7 +47,7 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
                 {usuario ? (
                     <>
-                        <Link to="/perfil" className="text-zinc-400 text-sm hover:text-white transition">
+                        <Link to="/perfil" className="text-white text-sm hover:underline transition">
                             {usuario.nombre}
                         </Link>
                         <button
@@ -60,7 +60,7 @@ export default function Navbar() {
                 ) : (
                     <Link
                         to="/login"
-                        className="text-sm text-zinc-500 hover:text-white transition uppercase tracking-widest"
+                        className="text-sm text-white hover:underline transition uppercase tracking-widest"
                     >
                         Iniciar sesión
                     </Link>
