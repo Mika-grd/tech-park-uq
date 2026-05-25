@@ -38,6 +38,9 @@ public class Atraccion {
 
     private String motivoCierre;
 
+    @Column(name = "zona_id")
+    private String zonaId;
+
     // Constructor vacío obligatorio para JPA
     public Atraccion() {
     }
@@ -116,5 +119,13 @@ public class Atraccion {
 
     public void setMotivoCierre(String motivoCierre) {
         this.motivoCierre = motivoCierre;
+    }
+
+    public String getZonaId() {
+        return zonaId;
+    }
+
+    public void setZonaId(String zonaId) {
+        this.zonaId = zonaId;
     }
 }

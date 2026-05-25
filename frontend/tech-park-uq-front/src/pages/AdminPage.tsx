@@ -29,6 +29,8 @@ export default function AdminPage() {
   const [guardandoOperador, setGuardandoOperador] = useState(false)
   const [operadorMsg, setOperadorMsg] = useState<string | null>(null)
 
+  const [zonas, setZonas] = useState<{ id: string; nombre: string }[]>([])
+
   const loadAtracciones = () =>
     api.get('/atracciones')
       .then(res => setAtracciones(Array.isArray(res.data) ? res.data : []))
@@ -193,7 +195,11 @@ export default function AdminPage() {
           </button>
 
           <button
-            onClick={() => { setModalOperador(true); setOperadorMsg(null) }}
+            onClick={() => {
+              setModalOperador(true)
+              setOperadorMsg(null)
+              api.get('/zonas').then(res => setZonas(Array.isArray(res.data) ? res.data : [])).catch(() => {})
+            }}
             className="rounded-3xl border border-white bg-black p-6 text-left hover:bg-white hover:text-black transition w-full"
           >
             <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Gestión de Operadores</h2>
@@ -282,7 +288,6 @@ export default function AdminPage() {
                   { label: 'Nombre', name: 'nombre', type: 'text' },
                   { label: 'Email', name: 'email', type: 'email' },
                   { label: 'Contraseña (mín. 8 caracteres)', name: 'password', type: 'password' },
-                  { label: 'Zona asignada (opcional)', name: 'zonaAsignada', type: 'text' },
                 ].map(campo => (
                   <div key={campo.name}>
                     <label className="text-xs text-white mb-1 block">{campo.label}</label>
@@ -295,6 +300,20 @@ export default function AdminPage() {
                     />
                   </div>
                 ))}
+                <div>
+                  <label className="text-xs text-white mb-1 block">Zona asignada</label>
+                  <select
+                    name="zonaAsignada"
+                    value={operadorForm.zonaAsignada}
+                    onChange={e => setOperadorForm(prev => ({ ...prev, zonaAsignada: e.target.value }))}
+                    className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none"
+                  >
+                    <option value="">— Sin zona —</option>
+                    {zonas.map(z => (
+                      <option key={z.id} value={z.id}>{z.nombre} ({z.id})</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {operadorMsg && (

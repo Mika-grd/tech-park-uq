@@ -18,6 +18,7 @@ interface Atraccion {
     visitantesAcumulados: number
     costoAdicional: number
     motivoCierre?: string
+    zonaId?: string
 }
 
 const estadoInicial = {
@@ -31,7 +32,8 @@ const estadoInicial = {
     tiempoEspera: 0,
     estado: 'ACTIVA',
     visitantesAcumulados: 0,
-    motivoCierre: ''
+    motivoCierre: '',
+    zonaId: ''
 }
 
 export default function AtraccionesPage() {
@@ -51,6 +53,7 @@ export default function AtraccionesPage() {
     const [filtroEstado, setFiltroEstado] = useState('')
 
     const [posicionFila, setPosicionFila] = useState<Record<string, number>>({})
+    const [zonasDisponibles, setZonasDisponibles] = useState<{ id: string; nombre: string }[]>([])
 
     const handleBuscar = async (q: string) => {
         setBusqueda(q)
@@ -102,7 +105,9 @@ export default function AtraccionesPage() {
 
     const cargarAtracciones = () => {
         setLoading(true)
-        api.get('/atracciones')
+        const zonaOp = usuario?.rol === 'Operador' ? usuario?.zonaAsignada : null
+        const url = zonaOp ? `/atracciones/zona/${zonaOp}` : '/atracciones'
+        api.get(url)
             .then(res => {
                 const data = Array.isArray(res.data) ? res.data : []
                 setAtracciones(data)
@@ -111,7 +116,13 @@ export default function AtraccionesPage() {
             .finally(() => setLoading(false))
     }
 
-    useEffect(() => { cargarAtracciones() }, [])
+    useEffect(() => { cargarAtracciones() }, [usuario])
+
+    useEffect(() => {
+        if (usuario?.rol === 'Administrador') {
+            api.get('/zonas').then(res => setZonasDisponibles(Array.isArray(res.data) ? res.data : [])).catch(() => {})
+        }
+    }, [usuario])
 
     const colorEstado = (estado: string) => {
         if (estado === 'ACTIVA') return 'bg-green-500'
@@ -131,7 +142,8 @@ export default function AtraccionesPage() {
     }
 
     const abrirNuevo = () => {
-        setForm(estadoInicial)
+        const zonaId = usuario?.rol === 'Operador' ? (usuario?.zonaAsignada ?? '') : ''
+        setForm({ ...estadoInicial, zonaId })
         setEditando(false)
         setModalAbierto(true)
     }
@@ -348,6 +360,30 @@ export default function AtraccionesPage() {
                                         <option value="EN_MANTENIMIENTO">En mantenimiento</option>
                                         <option value="CERRADA">Cerrada</option>
                                     </select>
+                                </div>
+
+                                <div className="col-span-2">
+                                    <label className="text-white text-xs mb-1 block">Zona</label>
+                                    {usuario?.rol === 'Operador' ? (
+                                        <input
+                                            type="text"
+                                            value={usuario?.zonaAsignada ?? ''}
+                                            disabled
+                                            className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white opacity-50"
+                                        />
+                                    ) : (
+                                        <select
+                                            name="zonaId"
+                                            value={form.zonaId ?? ''}
+                                            onChange={handleChange}
+                                            className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none"
+                                        >
+                                            <option value="">— Sin zona —</option>
+                                            {zonasDisponibles.map(z => (
+                                                <option key={z.id} value={z.id}>{z.nombre} ({z.id})</option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 

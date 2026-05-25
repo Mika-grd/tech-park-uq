@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AtraccionRepository extends JpaRepository<Atraccion, String> {
-    // El segundo parámetro es String porque tu @Id es de tipo String
+    java.util.List<Atraccion> findByZonaId(String zonaId);
 }

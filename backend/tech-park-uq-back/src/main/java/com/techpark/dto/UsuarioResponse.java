@@ -9,6 +9,7 @@ public record UsuarioResponse(
 	String documento,
 	Integer edad,
 	Double estatura,
-	Double saldoVirtual
+	Double saldoVirtual,
+	String zonaAsignada
 ) {
 }

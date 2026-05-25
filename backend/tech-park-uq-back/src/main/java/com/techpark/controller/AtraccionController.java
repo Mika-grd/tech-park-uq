@@ -25,6 +25,11 @@ public class AtraccionController {
         return repository.findAll();
     }
 
+    @GetMapping("/zona/{zonaId}")
+    public List<Atraccion> getByZona(@PathVariable String zonaId) {
+        return repository.findByZonaId(zonaId);
+    }
+
     @GetMapping("/buscar")
     public ResponseEntity<List<Atraccion>> buscar(@RequestParam String q) {
         if (q == null || q.isBlank()) {

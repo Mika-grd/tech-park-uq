@@ -186,28 +186,32 @@ public class UsuarioService {
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {
-    if (usuario instanceof com.techpark.model.Visitante v) {
+        String zonaAsignada = (usuario instanceof Operador op) ? op.getZonaAsignada() : null;
+        if (usuario instanceof Visitante v) {
+            return new UsuarioResponse(
+                usuario.getId(),
+                usuario.getEmail(),
+                usuario.getNombre(),
+                usuario.getRol(),
+                usuario.isActivo(),
+                v.getDocumento(),
+                v.getEdad(),
+                v.getEstatura(),
+                v.getSaldoVirtual(),
+                null
+            );
+        }
         return new UsuarioResponse(
             usuario.getId(),
             usuario.getEmail(),
             usuario.getNombre(),
             usuario.getRol(),
             usuario.isActivo(),
-            v.getDocumento(),
-            v.getEdad(),
-            v.getEstatura(),
-            v.getSaldoVirtual()
+            null,
+            null,
+            null,
+            null,
+            zonaAsignada
         );
-    }
-    return new UsuarioResponse(
-        usuario.getId(),
-        usuario.getEmail(),
-        usuario.getNombre(),
-        usuario.getRol(),
-        usuario.isActivo(),
-        null,
-        null,
-        null,
-        null);
     }
 }

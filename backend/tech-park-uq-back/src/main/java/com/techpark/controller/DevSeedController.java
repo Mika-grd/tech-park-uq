@@ -134,7 +134,7 @@ public class DevSeedController {
         int tiempoEspera = 5 + (i % 30);
         String motivo = estado == Atraccion.Estado.CERRADA ? "Temporal" : (estado == Atraccion.Estado.EN_MANTENIMIENTO ? "Mantenimiento" : null);
 
-        atraccionRepository.save(new Atraccion(
+        Atraccion atraccion = new Atraccion(
             id,
             nombre,
             tipo,
@@ -145,7 +145,9 @@ public class DevSeedController {
             tiempoEspera,
             estado,
             motivo
-        ));
+        );
+        atraccion.setZonaId(String.format("Z-%02d", ((i - 1) / 4) + 1));
+        atraccionRepository.save(atraccion);
         created++;
     }
         return created;

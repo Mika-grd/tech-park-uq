@@ -8,6 +8,7 @@ export type Usuario = {
   edad?: number | null
   estatura?: number | null
   saldoVirtual?: number | null
+  zonaAsignada?: string | null
 }
 
 export type LoginResponse = {
