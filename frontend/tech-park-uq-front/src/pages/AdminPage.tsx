@@ -124,7 +124,8 @@ export default function AdminPage() {
       if (e?.response?.status === 409) {
         setOperadorMsg('Error: ese email ya está registrado')
       } else {
-        setOperadorMsg(`Error: ${e?.response?.data?.message ?? 'no se pudo crear el operador'}`)
+        const detail = e?.response?.data?.message ?? e?.response?.data?.error ?? `HTTP ${e?.response?.status ?? 'sin respuesta'}`
+        setOperadorMsg(`Error: ${detail}`)
       }
     } finally {
       setGuardandoOperador(false)
