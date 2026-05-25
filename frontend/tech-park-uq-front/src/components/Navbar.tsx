@@ -6,7 +6,7 @@ const allLinks = [
     { path: '/atracciones', label: 'Atracciones', roles: null },
     { path: '/zonas', label: 'Zonas', roles: null },
     { path: '/mapa', label: 'Mapa', roles: null },
-    { path: '/estadisticas', label: 'Estadísticas', roles: ['Administrador', 'Operador'] },
+    { path: '/estadisticas', label: 'Estadísticas', roles: ['Administrador'] },
 ]
 
 export default function Navbar() {
