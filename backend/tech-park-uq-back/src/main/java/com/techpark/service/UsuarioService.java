@@ -1,9 +1,11 @@
 package com.techpark.service;
 
 import com.techpark.dto.LoginRequest;
+import com.techpark.dto.OperadorRequest;
 import com.techpark.dto.RegisterRequest;
 import com.techpark.dto.UsuarioResponse;
 import com.techpark.exception.EmailAlreadyRegisteredException;
+import com.techpark.model.Operador;
 import com.techpark.model.Usuario;
 import com.techpark.model.Visitante;
 import com.techpark.repository.UsuarioRepository;
@@ -136,6 +138,27 @@ public class UsuarioService {
         admin.setActivo(true);
 
         return usuarioRepository.save(admin);
+    }
+
+    @Transactional
+    public Usuario crearOperador(OperadorRequest request) {
+        if (request == null || request.email() == null || request.password() == null) {
+            throw new IllegalArgumentException("Solicitud inválida");
+        }
+        String email = request.email().trim();
+        if (email.isEmpty()) throw new IllegalArgumentException("Correo requerido");
+        if (emailExists(email)) throw new EmailAlreadyRegisteredException();
+        if (request.password().length() < 8) throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
+        if (request.nombre() == null || request.nombre().isBlank()) throw new IllegalArgumentException("Nombre requerido");
+
+        Operador operador = new Operador();
+        operador.setEmail(email);
+        operador.setPassword(encodePasswordForStorage(request.password()));
+        operador.setNombre(request.nombre().trim());
+        operador.setZonaAsignada(request.zonaAsignada() != null ? request.zonaAsignada().trim() : null);
+        operador.setActivo(true);
+
+        return usuarioRepository.save(operador);
     }
 
     @Transactional

@@ -9,6 +9,7 @@ interface Atraccion {
 }
 
 const adminFormInicial = { nombre: '', email: '', password: '' }
+const operadorFormInicial = { nombre: '', email: '', password: '', zonaAsignada: '' }
 
 export default function AdminPage() {
   const { usuario, ready } = useAuth()
@@ -22,6 +23,11 @@ export default function AdminPage() {
   const [adminForm, setAdminForm] = useState(adminFormInicial)
   const [guardandoAdmin, setGuardandoAdmin] = useState(false)
   const [adminMsg, setAdminMsg] = useState<string | null>(null)
+
+  const [modalOperador, setModalOperador] = useState(false)
+  const [operadorForm, setOperadorForm] = useState(operadorFormInicial)
+  const [guardandoOperador, setGuardandoOperador] = useState(false)
+  const [operadorMsg, setOperadorMsg] = useState<string | null>(null)
 
   const loadAtracciones = () =>
     api.get('/atracciones')
@@ -98,6 +104,33 @@ export default function AdminPage() {
     }
   }
 
+  async function handleCrearOperador() {
+    if (!operadorForm.nombre || !operadorForm.email || !operadorForm.password) {
+      setOperadorMsg('Completa los campos obligatorios')
+      return
+    }
+    setGuardandoOperador(true)
+    setOperadorMsg(null)
+    try {
+      await api.post('/usuarios/operador', {
+        nombre: operadorForm.nombre,
+        email: operadorForm.email,
+        password: operadorForm.password,
+        zonaAsignada: operadorForm.zonaAsignada || null,
+      })
+      setOperadorMsg('Operador creado correctamente')
+      setOperadorForm(operadorFormInicial)
+    } catch (e: any) {
+      if (e?.response?.status === 409) {
+        setOperadorMsg('Error: ese email ya está registrado')
+      } else {
+        setOperadorMsg(`Error: ${e?.response?.data?.message ?? 'no se pudo crear el operador'}`)
+      }
+    } finally {
+      setGuardandoOperador(false)
+    }
+  }
+
   if (!ready) return null
   return (
     <MainLayout>
@@ -157,6 +190,14 @@ export default function AdminPage() {
             >
               <h2 className="text-xl font-semibold text-white">Gestión de Administradores</h2>
               <p className="mt-2 text-zinc-400">Registra nuevos administradores.</p>
+            </button>
+
+            <button
+              onClick={() => { setModalOperador(true); setOperadorMsg(null) }}
+              className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-left hover:border-zinc-600 hover:bg-zinc-900 transition w-full"
+            >
+              <h2 className="text-xl font-semibold text-white">Gestión de Operadores</h2>
+              <p className="mt-2 text-zinc-400">Registra nuevos operadores y asígnalos a una zona.</p>
             </button>
 
             <article className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
@@ -223,6 +264,56 @@ export default function AdminPage() {
                   className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50"
                 >
                   {guardandoAdmin ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {modalOperador && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-6 tracking-wide">Nuevo Operador</h2>
+
+              <div className="flex flex-col gap-4">
+                {[
+                  { label: 'Nombre', name: 'nombre', type: 'text' },
+                  { label: 'Email', name: 'email', type: 'email' },
+                  { label: 'Contraseña (mín. 8 caracteres)', name: 'password', type: 'password' },
+                  { label: 'Zona asignada (opcional)', name: 'zonaAsignada', type: 'text' },
+                ].map(campo => (
+                  <div key={campo.name}>
+                    <label className="text-xs text-zinc-400 mb-1 block">{campo.label}</label>
+                    <input
+                      type={campo.type}
+                      name={campo.name}
+                      value={(operadorForm as any)[campo.name]}
+                      onChange={e => setOperadorForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                      className="w-full bg-zinc-800 text-white rounded-lg px-3 py-2 text-sm border border-zinc-700 focus:outline-none focus:border-zinc-400"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {operadorMsg && (
+                <p className={`mt-4 text-xs ${operadorMsg.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+                  {operadorMsg}
+                </p>
+              )}
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => { setModalOperador(false); setOperadorForm(operadorFormInicial); setOperadorMsg(null) }}
+                  className="px-4 py-2 rounded-lg border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCrearOperador}
+                  disabled={guardandoOperador}
+                  className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-zinc-300 transition text-sm disabled:opacity-50"
+                >
+                  {guardandoOperador ? 'Guardando...' : 'Guardar'}
                 </button>
               </div>
             </div>

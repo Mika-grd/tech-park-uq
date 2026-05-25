@@ -26,6 +26,6 @@ public class Operador extends Usuario {
 
     @Override
     public String getRol() {
-        return Rol.Usuario.name();
+        return "Operador";
     }
 }
