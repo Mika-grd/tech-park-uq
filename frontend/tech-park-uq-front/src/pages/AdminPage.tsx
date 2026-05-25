@@ -11,6 +11,8 @@ interface Atraccion {
 const adminFormInicial = { nombre: '', email: '', password: '' }
 const operadorFormInicial = { nombre: '', email: '', password: '', zonaAsignada: '' }
 
+const TIPOS_CLIMA = ['Tormenta eléctrica', 'Lluvia fuerte', 'Vientos extremos', 'Granizo', 'Otro']
+
 export default function AdminPage() {
   const { usuario, ready } = useAuth()
   const [atracciones, setAtracciones] = useState<Atraccion[]>([])
@@ -28,6 +30,13 @@ export default function AdminPage() {
   const [operadorForm, setOperadorForm] = useState(operadorFormInicial)
   const [guardandoOperador, setGuardandoOperador] = useState(false)
   const [operadorMsg, setOperadorMsg] = useState<string | null>(null)
+
+  const [modalAlerta, setModalAlerta] = useState(false)
+  const [tipoClima, setTipoClima] = useState(TIPOS_CLIMA[0])
+  const [motivoPersonalizado, setMotivoPersonalizado] = useState('')
+  const [activandoAlerta, setActivandoAlerta] = useState(false)
+  const [desactivandoAlerta, setDesactivandoAlerta] = useState(false)
+  const [alertaMsg, setAlertaMsg] = useState<string | null>(null)
 
   const [zonas, setZonas] = useState<{ id: string; nombre: string }[]>([])
 
@@ -134,6 +143,41 @@ export default function AdminPage() {
     }
   }
 
+  async function handleDesactivarAlerta() {
+    setDesactivandoAlerta(true)
+    setAlertaMsg(null)
+    try {
+      const res = await api.post('/alertas/climatica/desactivar')
+      setAlertaMsg(`Alerta desactivada: ${res.data.atraccionesReabiertas} atracción(es) reabiertas.`)
+      loadAtracciones()
+    } catch (e: any) {
+      setAlertaMsg(`Error: ${e?.response?.data?.message ?? 'no se pudo desactivar la alerta'}`)
+    } finally {
+      setDesactivandoAlerta(false)
+    }
+  }
+
+  async function handleActivarAlerta() {
+    const motivo = tipoClima === 'Otro' ? motivoPersonalizado.trim() : tipoClima
+    if (!motivo) {
+      setAlertaMsg('Especifica el motivo de la alerta')
+      return
+    }
+    setActivandoAlerta(true)
+    setAlertaMsg(null)
+    try {
+      const res = await api.post('/alertas/climatica', { motivo })
+      setAlertaMsg(
+        `Alerta activada: ${res.data.atraccionesAfectadas} atracción(es) cerrada(s) y visitantes notificados.`
+      )
+      loadAtracciones()
+    } catch (e: any) {
+      setAlertaMsg(`Error: ${e?.response?.data?.message ?? 'no se pudo activar la alerta'}`)
+    } finally {
+      setActivandoAlerta(false)
+    }
+  }
+
   if (!ready) return null
   return (
     <MainLayout>
@@ -206,6 +250,14 @@ export default function AdminPage() {
             <p className="mt-2">Registra nuevos operadores y asígnalos a una zona.</p>
           </button>
 
+          <button
+            onClick={() => { setModalAlerta(true); setAlertaMsg(null) }}
+            className="rounded-3xl border border-amber-600 bg-black p-6 text-left hover:bg-amber-950/40 transition w-full"
+          >
+            <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold text-amber-400">Alerta Climática</h2>
+            <p className="mt-2 text-amber-200/80">Cierra atracciones acuáticas y de altura y notifica a todos los visitantes.</p>
+          </button>
+
           <article className="rounded-3xl border border-white bg-black p-6">
             <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Reportes</h2>
             <p className="mt-2">Consulta ingresos, visitantes y alertas de mantenimiento.</p>
@@ -271,6 +323,82 @@ export default function AdminPage() {
                   className="px-4 py-2 rounded-lg bg-white text-black font-bold hover:bg-white transition text-sm disabled:opacity-50"
                 >
                   {guardandoAdmin ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Alerta Climática */}
+        {modalAlerta && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-black border border-amber-600 rounded-2xl p-8 w-full max-w-md relative">
+
+              {/* Botón cerrar X */}
+              <button
+                onClick={() => { setModalAlerta(false); setAlertaMsg(null); setMotivoPersonalizado('') }}
+                className="absolute top-4 right-4 text-white hover:text-amber-400 transition text-xl leading-none"
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
+
+              <h2 className="font-['Ghastly_Panic'] text-3xl font-bold mb-2 tracking-wide text-amber-400">
+                Alerta Climática
+              </h2>
+              <p className="text-sm text-amber-200/70 mb-6">
+                Se cerrarán <strong>todas</strong> las atracciones del parque y todos los visitantes registrados recibirán una notificación.
+              </p>
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs text-amber-300 mb-1 block uppercase tracking-widest">Tipo de alerta</label>
+                  <select
+                    value={tipoClima}
+                    onChange={e => setTipoClima(e.target.value)}
+                    className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-amber-600 focus:outline-none"
+                  >
+                    {TIPOS_CLIMA.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {tipoClima === 'Otro' && (
+                  <div>
+                    <label className="text-xs text-amber-300 mb-1 block uppercase tracking-widest">Descripción del motivo</label>
+                    <input
+                      type="text"
+                      value={motivoPersonalizado}
+                      onChange={e => setMotivoPersonalizado(e.target.value)}
+                      placeholder="Ej: Niebla densa"
+                      className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-amber-600 focus:outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {alertaMsg && (
+                <p className={`mt-4 text-xs ${alertaMsg.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+                  {alertaMsg}
+                </p>
+              )}
+
+              <div className="flex justify-between gap-3 mt-6">
+                <button
+                  onClick={handleDesactivarAlerta}
+                  disabled={desactivandoAlerta || activandoAlerta}
+                  className="px-4 py-2 rounded-lg border border-red-700 text-red-400 hover:bg-red-950/40 transition text-sm disabled:opacity-50"
+                >
+                  {desactivandoAlerta ? 'Quitando...' : 'Quitar alerta'}
+                </button>
+
+                <button
+                  onClick={handleActivarAlerta}
+                  disabled={activandoAlerta || desactivandoAlerta}
+                  className="px-4 py-2 rounded-lg bg-amber-600 text-black font-bold hover:bg-amber-500 transition text-sm disabled:opacity-50"
+                >
+                  {activandoAlerta ? 'Activando...' : 'Activar alerta'}
                 </button>
               </div>
             </div>

@@ -6,6 +6,7 @@ import com.techpark.model.Operador;
 import com.techpark.model.Visitante;
 import com.techpark.model.Zona;
 import com.techpark.repository.AtraccionRepository;
+import com.techpark.repository.NotificacionRepository;
 import com.techpark.repository.TicketRepository;
 import com.techpark.repository.UsuarioRepository;
 import com.techpark.repository.ZonaRepository;
@@ -27,6 +28,7 @@ public class DevSeedController {
     private final ZonaRepository zonaRepository;
     private final UsuarioRepository usuarioRepository;
     private final TicketRepository ticketRepository;
+    private final NotificacionRepository notificacionRepository;
     private final UsuarioService usuarioService;
 
     public DevSeedController(
@@ -34,12 +36,14 @@ public class DevSeedController {
             ZonaRepository zonaRepository,
             UsuarioRepository usuarioRepository,
             TicketRepository ticketRepository,
+            NotificacionRepository notificacionRepository,
             UsuarioService usuarioService
     ) {
         this.atraccionRepository = atraccionRepository;
         this.zonaRepository = zonaRepository;
         this.usuarioRepository = usuarioRepository;
         this.ticketRepository = ticketRepository;
+        this.notificacionRepository = notificacionRepository;
         this.usuarioService = usuarioService;
     }
 
@@ -73,6 +77,7 @@ public class DevSeedController {
     @PostMapping("/clear")
     @Transactional
     public ResponseEntity<Map<String, Object>> clearDb() {
+        notificacionRepository.deleteAll();
         ticketRepository.deleteAll();
         atraccionRepository.deleteAll();
         zonaRepository.deleteAll();

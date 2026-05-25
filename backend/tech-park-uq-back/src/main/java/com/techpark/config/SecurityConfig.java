@@ -51,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/atracciones/**").permitAll()
                         .requestMatchers("/api/zonas/**").permitAll()
                         .requestMatchers("/api/ruta", "/api/ruta/**").permitAll()
+                        .requestMatchers("/api/alertas/**").permitAll()
+                        .requestMatchers("/api/notificaciones/**").permitAll()
 
                         .anyRequest().authenticated())
                 .headers(h -> h.frameOptions(frame -> frame.sameOrigin()))
