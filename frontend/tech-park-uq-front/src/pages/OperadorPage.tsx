@@ -1,36 +1,24 @@
 import MainLayout from '../layouts/MainLayout'
+import { useAuth } from '../context/AuthContext'
 
 export default function OperadorPage() {
+  const { usuario } = useAuth()
+
   return (
     <MainLayout>
-      <main className="bg-black min-h-screen p-8">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="font-['Ghastly_Panic'] text-4xl font-semibold text-white">Panel de Operador</h1>
-          <p className="mt-4 text-white">
-            Aquí podrás gestionar las atracciones de tu zona y revisar el acceso seguro de visitantes.
+      <main className="bg-black text-white min-h-screen relative flex items-center justify-center">
+        {usuario?.nombre && (
+          <p className="absolute top-6 left-8 text-sm text-white tracking-widest uppercase">
+            Bienvenido, {usuario.nombre}
           </p>
-
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            <article className="rounded-3xl border border-white bg-black p-6">
-              <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold text-white">Atracciones asignadas</h2>
-              <p className="mt-2 text-white">Visualiza y actualiza el estado de tus atracciones.</p>
-            </article>
-
-            <article className="rounded-3xl border border-white bg-black p-6">
-              <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold text-white">Control de acceso</h2>
-              <p className="mt-2 text-white">Valida edad, altura y capacidad por ciclo.</p>
-            </article>
-
-            <article className="rounded-3xl border border-white bg-black p-6">
-              <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold text-white">Cola prioritaria</h2>
-              <p className="mt-2 text-white">Procesa primero a los visitantes Fast-Pass.</p>
-            </article>
-
-            <article className="rounded-3xl border border-white bg-black p-6">
-              <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold text-white">Revisiones técnicas</h2>
-              <p className="mt-2 text-white">Registra mantenimientos y cambios de estado.</p>
-            </article>
-          </div>
+        )}
+        <div className="text-center">
+          <h1 className="font-['Ghastly_Panic'] text-7xl md:text-[10rem] uppercase tracking-[0.12em] text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+            tech-park-uq
+          </h1>
+          <p className="mt-6 text-sm md:text-base tracking-[0.35em] uppercase text-white">
+            Sistema de gestión del parque
+          </p>
         </div>
       </main>
     </MainLayout>
