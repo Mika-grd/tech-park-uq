@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ruta", "/api/ruta/**").permitAll()
                         .requestMatchers("/api/alertas/**").permitAll()
                         .requestMatchers("/api/notificaciones/**").permitAll()
+                        .requestMatchers("/api/tickets/**").permitAll()
 
                         .anyRequest().authenticated())
                 .headers(h -> h.frameOptions(frame -> frame.sameOrigin()))

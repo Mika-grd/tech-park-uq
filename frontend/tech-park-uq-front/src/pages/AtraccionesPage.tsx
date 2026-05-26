@@ -19,6 +19,7 @@ interface Atraccion {
     costoAdicional: number
     motivoCierre?: string
     zonaId?: string
+    operadorId?: number | null
 }
 
 const estadoInicial = {
@@ -33,7 +34,8 @@ const estadoInicial = {
     estado: 'ACTIVA',
     visitantesAcumulados: 0,
     motivoCierre: '',
-    zonaId: ''
+    zonaId: '',
+    operadorId: null as number | null
 }
 
 export default function AtraccionesPage() {
@@ -54,6 +56,7 @@ export default function AtraccionesPage() {
 
     const [posicionFila, setPosicionFila] = useState<Record<string, number>>({})
     const [zonasDisponibles, setZonasDisponibles] = useState<{ id: string; nombre: string }[]>([])
+    const [operadoresDisponibles, setOperadoresDisponibles] = useState<{ id: number; nombre: string; zonaAsignada: string | null }[]>([])
 
     const handleBuscar = async (q: string) => {
         setBusqueda(q)
@@ -89,6 +92,7 @@ export default function AtraccionesPage() {
             const res = await unirseAFila(id)
             await registrarVisita(id)
             setPosicionFila(prev => ({ ...prev, [id]: res.posicion }))
+            cargarAtracciones()
         } catch (e: any) {
             alert(e?.response?.data?.message ?? 'Error al unirse a la fila')
         }
@@ -121,6 +125,7 @@ export default function AtraccionesPage() {
     useEffect(() => {
         if (usuario?.rol === 'Administrador') {
             api.get('/zonas').then(res => setZonasDisponibles(Array.isArray(res.data) ? res.data : [])).catch(() => {})
+            api.get('/usuarios/operadores').then(res => setOperadoresDisponibles(Array.isArray(res.data) ? res.data : [])).catch(() => {})
         }
     }, [usuario])
 
@@ -385,6 +390,23 @@ export default function AtraccionesPage() {
                                         </select>
                                     )}
                                 </div>
+
+                                {usuario?.rol === 'Administrador' && (
+                                    <div className="col-span-2">
+                                        <label className="text-white text-xs mb-1 block">Operador asignado *</label>
+                                        <select
+                                            name="operadorId"
+                                            value={form.operadorId ?? ''}
+                                            onChange={e => setForm(prev => ({ ...prev, operadorId: e.target.value ? Number(e.target.value) : null }))}
+                                            className="w-full bg-black text-white rounded-lg px-3 py-2 text-sm border border-white focus:outline-none"
+                                        >
+                                            <option value="">— Selecciona un operador —</option>
+                                            {operadoresDisponibles.map(op => (
+                                                <option key={op.id} value={op.id}>{op.nombre} {op.zonaAsignada ? `(Zona: ${op.zonaAsignada})` : ''}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex justify-end gap-3 mt-6">

@@ -41,6 +41,16 @@ public class TicketController {
         return ResponseEntity.ok(TicketService.PRECIOS);
     }
 
+    @GetMapping("/recaudacion-hoy")
+    public ResponseEntity<?> getRecaudacionHoy() {
+        java.time.LocalDateTime inicio = java.time.LocalDate.now().atStartOfDay();
+        java.time.LocalDateTime fin = inicio.plusDays(1);
+        return ResponseEntity.ok(Map.of(
+            "totalHoy", ticketService.getRecaudacionEntre(inicio, fin),
+            "ventasHoy", ticketService.getVentasEntre(inicio, fin)
+        ));
+    }
+
     @GetMapping("/activo")
     public ResponseEntity<?> getTicketActivo(HttpServletRequest request) {
         Long userId = extractUserId(request);

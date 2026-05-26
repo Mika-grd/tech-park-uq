@@ -39,6 +39,12 @@ export default function AdminPage() {
   const [alertaMsg, setAlertaMsg] = useState<string | null>(null)
 
   const [zonas, setZonas] = useState<{ id: string; nombre: string }[]>([])
+  const [recaudacion, setRecaudacion] = useState<{ totalHoy: number; ventasHoy: number } | null>(null)
+
+  const loadRecaudacion = () =>
+    api.get('/tickets/recaudacion-hoy')
+      .then(res => setRecaudacion(res.data))
+      .catch(() => {})
 
   const loadAtracciones = () =>
     api.get('/atracciones')
@@ -47,6 +53,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadAtracciones()
+    loadRecaudacion()
   }, [])
 
   async function handleSeed() {
@@ -264,8 +271,8 @@ export default function AdminPage() {
           </article>
         </div>
 
-        {/* Stats */}
-        <div className="max-w-5xl mx-auto px-8 mt-10 pb-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Stats atracciones */}
+        <div className="max-w-5xl mx-auto px-8 mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Total', value: total, color: 'border-white' },
             { label: 'Activas', value: activas, color: 'border-green-600' },
@@ -277,6 +284,22 @@ export default function AdminPage() {
               <p className="text-xs text-white uppercase tracking-widest mt-2">{stat.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Stats recaudación */}
+        <div className="max-w-5xl mx-auto px-8 mt-4 pb-16 grid grid-cols-2 gap-4">
+          <div className="bg-black border border-green-700 rounded-xl p-6 text-center">
+            <p className="text-4xl font-bold text-green-400">
+              ${recaudacion ? recaudacion.totalHoy.toLocaleString('es-CO') : '—'}
+            </p>
+            <p className="text-xs text-white uppercase tracking-widest mt-2">Recaudado hoy</p>
+          </div>
+          <div className="bg-black border border-blue-700 rounded-xl p-6 text-center">
+            <p className="text-4xl font-bold text-blue-400">
+              {recaudacion ? recaudacion.ventasHoy : '—'}
+            </p>
+            <p className="text-xs text-white uppercase tracking-widest mt-2">Tickets vendidos hoy</p>
+          </div>
         </div>
 
         {/* Modal Admin */}

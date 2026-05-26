@@ -41,6 +41,9 @@ public class Atraccion {
     @Column(name = "zona_id")
     private String zonaId;
 
+    @Column(name = "operador_id")
+    private Long operadorId;
+
     // Constructor vacío obligatorio para JPA
     public Atraccion() {
     }
@@ -127,5 +130,13 @@ public class Atraccion {
 
     public void setZonaId(String zonaId) {
         this.zonaId = zonaId;
+    }
+
+    public Long getOperadorId() {
+        return operadorId;
+    }
+
+    public void setOperadorId(Long operadorId) {
+        this.operadorId = operadorId;
     }
 }

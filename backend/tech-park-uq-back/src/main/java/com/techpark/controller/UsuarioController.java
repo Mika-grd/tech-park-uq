@@ -9,6 +9,7 @@ import com.techpark.exception.EmailAlreadyRegisteredException;
 import com.techpark.model.Usuario;
 import com.techpark.security.JwtCookieFactory;
 import com.techpark.security.JwtService;
+import com.techpark.repository.UsuarioRepository;
 import com.techpark.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +25,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private JwtService jwtService;
@@ -125,8 +129,10 @@ public class UsuarioController {
             }
             com.techpark.model.Usuario usuario = usuarioService.addSaldoToUser(userId, body.amount());
             return ResponseEntity.ok(new LoginResponse(usuarioService.toUsuarioResponse(usuario)));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(java.util.Map.of("message", "Error interno"));
+            return ResponseEntity.status(500).body(java.util.Map.of("message", e.getMessage()));
         }
     }
 
@@ -207,6 +213,23 @@ public class UsuarioController {
             return ResponseEntity.status(401).build();
         historialService.registrar(userId, atraccionId);
         return ResponseEntity.ok(historialService.listar(userId));
+    }
+
+    @GetMapping("/operadores")
+    public ResponseEntity<?> getOperadores() {
+        return ResponseEntity.ok(
+            usuarioRepository.findAll().stream()
+                .filter(u -> u instanceof com.techpark.model.Operador)
+                .map(u -> {
+                    com.techpark.model.Operador op = (com.techpark.model.Operador) u;
+                    return java.util.Map.of(
+                        "id", op.getId(),
+                        "nombre", op.getNombre(),
+                        "zonaAsignada", op.getZonaAsignada() != null ? op.getZonaAsignada() : ""
+                    );
+                })
+                .toList()
+        );
     }
 
 }

@@ -164,25 +164,13 @@ public class UsuarioService {
     @Transactional
     public Usuario addSaldoToUser(long userId, Double amount) {
         if (amount == null || amount <= 0) throw new IllegalArgumentException("Amount must be positive");
-        Usuario usuario = usuarioRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        // Only visitantes have saldoVirtual, but model Visitante extends Usuario — use reflection via getter/setter
-        double current = 0.0;
-        try {
-            java.lang.reflect.Method getter = usuario.getClass().getMethod("getSaldoVirtual");
-            Object val = getter.invoke(usuario);
-            if (val instanceof Number) current = ((Number) val).doubleValue();
-        } catch (NoSuchMethodException ignored) {
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        Usuario usuario = usuarioRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        if (!(usuario instanceof Visitante v)) {
+            throw new IllegalArgumentException("Solo los visitantes pueden recargar saldo");
         }
-        double next = current + amount;
-        try {
-            java.lang.reflect.Method setter = usuario.getClass().getMethod("setSaldoVirtual", double.class);
-            setter.invoke(usuario, next);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return usuarioRepository.save(usuario);
+        v.setSaldoVirtual(v.getSaldoVirtual() + amount);
+        return usuarioRepository.save(v);
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

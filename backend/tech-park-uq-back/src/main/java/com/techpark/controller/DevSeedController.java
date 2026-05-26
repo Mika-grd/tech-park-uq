@@ -110,48 +110,47 @@ public class DevSeedController {
 
     private int seedAtracciones() {
         int created = 0;
-    for (int i = 1; i <= 20; i++) {
-        String id = String.format("A-%02d", i);
-    if (atraccionRepository.existsById(id)) continue;
+        for (int i = 1; i <= 20; i++) {
+            String id = String.format("A-%02d", i);
+            String zonaId = String.format("Z-%02d", ((i - 1) / 4) + 1);
 
-        Atraccion.Tipo tipo = (i % 3 == 0)
-            ? Atraccion.Tipo.ACUATICA
-            : (i % 3 == 1 ? Atraccion.Tipo.MECANICA_ALTURA : Atraccion.Tipo.OTRO);
+            if (atraccionRepository.existsById(id)) {
+                atraccionRepository.findById(id).ifPresent(existing -> {
+                    if (existing.getZonaId() == null || existing.getZonaId().isBlank()) {
+                        existing.setZonaId(zonaId);
+                        atraccionRepository.save(existing);
+                    }
+                });
+                continue;
+            }
 
-        Atraccion.Estado estado;
-        if (i % 10 == 0) estado = Atraccion.Estado.CERRADA;
-        else if (i % 7 == 0) estado = Atraccion.Estado.EN_MANTENIMIENTO;
-        else estado = Atraccion.Estado.ACTIVA;
+            Atraccion.Tipo tipo = (i % 3 == 0)
+                ? Atraccion.Tipo.ACUATICA
+                : (i % 3 == 1 ? Atraccion.Tipo.MECANICA_ALTURA : Atraccion.Tipo.OTRO);
 
-        String nombre = switch (tipo) {
-        case ACUATICA -> "Aqua Splash " + i;
-        case MECANICA_ALTURA -> "Sky Force " + i;
-        default -> "Aventura " + i;
-        };
+            Atraccion.Estado estado;
+            if (i % 10 == 0) estado = Atraccion.Estado.CERRADA;
+            else if (i % 7 == 0) estado = Atraccion.Estado.EN_MANTENIMIENTO;
+            else estado = Atraccion.Estado.ACTIVA;
 
-        int capacidad = 12 + (i % 15);
-        double alturaMin = tipo == Atraccion.Tipo.MECANICA_ALTURA ? 1.3 : 0.9;
-        int edadMin = tipo == Atraccion.Tipo.OTRO ? 8 : 10;
-        double costoAdicional = 2000 + (i * 150);
-        int tiempoEspera = 5 + (i % 30);
-        String motivo = estado == Atraccion.Estado.CERRADA ? "Temporal" : (estado == Atraccion.Estado.EN_MANTENIMIENTO ? "Mantenimiento" : null);
+            String nombre = switch (tipo) {
+                case ACUATICA -> "Aqua Splash " + i;
+                case MECANICA_ALTURA -> "Sky Force " + i;
+                default -> "Aventura " + i;
+            };
 
-        Atraccion atraccion = new Atraccion(
-            id,
-            nombre,
-            tipo,
-            capacidad,
-            alturaMin,
-            edadMin,
-            costoAdicional,
-            tiempoEspera,
-            estado,
-            motivo
-        );
-        atraccion.setZonaId(String.format("Z-%02d", ((i - 1) / 4) + 1));
-        atraccionRepository.save(atraccion);
-        created++;
-    }
+            int capacidad = 12 + (i % 15);
+            double alturaMin = tipo == Atraccion.Tipo.MECANICA_ALTURA ? 1.3 : 0.9;
+            int edadMin = tipo == Atraccion.Tipo.OTRO ? 8 : 10;
+            double costoAdicional = 2000 + (i * 150);
+            int tiempoEspera = 5 + (i % 30);
+            String motivo = estado == Atraccion.Estado.CERRADA ? "Temporal" : (estado == Atraccion.Estado.EN_MANTENIMIENTO ? "Mantenimiento" : null);
+
+            Atraccion atraccion = new Atraccion(id, nombre, tipo, capacidad, alturaMin, edadMin, costoAdicional, tiempoEspera, estado, motivo);
+            atraccion.setZonaId(zonaId);
+            atraccionRepository.save(atraccion);
+            created++;
+        }
         return created;
     }
 

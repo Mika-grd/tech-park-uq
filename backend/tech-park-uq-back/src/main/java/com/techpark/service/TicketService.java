@@ -30,6 +30,14 @@ public class TicketService {
         return ticketRepository.findByUsuarioIdAndActivoTrue(userId);
     }
 
+    public double getRecaudacionEntre(java.time.LocalDateTime inicio, java.time.LocalDateTime fin) {
+        return ticketRepository.sumRecaudacion(inicio, fin);
+    }
+
+    public long getVentasEntre(java.time.LocalDateTime inicio, java.time.LocalDateTime fin) {
+        return ticketRepository.countVentas(inicio, fin);
+    }
+
     @Transactional
     public Ticket comprar(Long userId, TipoTicket tipo) {
         Usuario usuario = usuarioRepository.findById(userId)

@@ -7,6 +7,7 @@ import com.techpark.model.Visitante;
 import com.techpark.repository.AtraccionRepository;
 import com.techpark.repository.UsuarioRepository;
 import com.techpark.repository.VisitanteRepository;
+import com.techpark.repository.ZonaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,8 @@ public class VisitaService {
     private TicketService ticketService;
     @Autowired
     private FilaService filaService;
+    @Autowired
+    private ZonaRepository zonaRepository;
 
     @Transactional
     public Map<String, Object> unirseAFila(Long userId, String atraccionId) {
@@ -61,11 +64,19 @@ public class VisitaService {
         }
 
         atraccion.setVisitantesAcumulados(atraccion.getVisitantesAcumulados() + 1);
+        atraccion.setTiempoEspera(atraccion.getTiempoEspera() + 2);
         if (atraccion.getVisitantesAcumulados() >= 500) {
             atraccion.setEstado(Atraccion.Estado.EN_MANTENIMIENTO);
             atraccion.setMotivoCierre("Mantenimiento preventivo automático (500 visitantes)");
         }
         atraccionRepository.save(atraccion);
+
+        if (atraccion.getZonaId() != null) {
+            zonaRepository.findById(atraccion.getZonaId()).ifPresent(zona -> {
+                zona.setVisitantesActuales(zona.getVisitantesActuales() + 1);
+                zonaRepository.save(zona);
+            });
+        }
 
         filaService.unirse(userId, atraccionId, ticketOpt.get().getTipo());
         int posicion = filaService.getPosicion(userId, atraccionId);
