@@ -17,7 +17,7 @@ export default function HomePage() {
             tech-park-uq
           </h1>
           <p className="mt-6 text-sm md:text-base tracking-[0.35em] uppercase text-white">
-            Sistema de gestión del parque
+            Bienvenido al mejor parque de diversiones
           </p>
         </div>
       </main>
