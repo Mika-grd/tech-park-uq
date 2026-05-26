@@ -265,10 +265,13 @@ export default function AdminPage() {
             <p className="mt-2 text-amber-200/80">Cierra atracciones acuáticas y de altura y notifica a todos los visitantes.</p>
           </button>
 
-          <article className="rounded-3xl border border-white bg-black p-6">
+          <Link
+            to="/estadisticas"
+            className="rounded-3xl border border-white bg-black p-6 text-left hover:bg-white hover:text-black transition block"
+          >
             <h2 className="font-['Ghastly_Panic'] text-3xl font-semibold">Reportes</h2>
             <p className="mt-2">Consulta ingresos, visitantes y alertas de mantenimiento.</p>
-          </article>
+          </Link>
         </div>
 
         {/* Stats atracciones */}
