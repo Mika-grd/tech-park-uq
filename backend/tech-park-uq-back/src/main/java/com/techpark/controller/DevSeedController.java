@@ -84,8 +84,11 @@ public class DevSeedController {
         zonaRepository.deleteAll();
         usuarioRepository.deleteAll();
 
+        int usuariosCreated = seedAdmin("admin@techpark.com", "Admin", "admin12345");
+
         Map<String, Object> out = new LinkedHashMap<>();
-    out.put("message", "DB cleared");
+        out.put("message", "DB cleared — admin re-creado");
+        out.put("usuariosCreated", usuariosCreated);
         out.put("zonaCount", zonaRepository.count());
         out.put("atraccionCount", atraccionRepository.count());
         out.put("usuarioCount", usuarioRepository.count());
