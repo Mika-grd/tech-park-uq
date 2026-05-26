@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -83,12 +84,8 @@ public class DevSeedController {
         zonaRepository.deleteAll();
         usuarioRepository.deleteAll();
 
-        //Hacemos los datos base para que el admin siempre exista aunque se limpie la base. :)
-        int usuariosCreated = seedUsuarios();
-
         Map<String, Object> out = new LinkedHashMap<>();
-        out.put("message", "DB cleared and base users re-seeded");
-        out.put("usuariosCreated", usuariosCreated);
+    out.put("message", "DB cleared");
         out.put("zonaCount", zonaRepository.count());
         out.put("atraccionCount", atraccionRepository.count());
         out.put("usuarioCount", usuarioRepository.count());
@@ -162,46 +159,114 @@ public class DevSeedController {
         int created = 0;
 
         // Admin
-        created += seedAdmin("admin@techpark.com", "Juanes", "admin12345");
+    created += seedAdmin("admin@techpark.com", "Admin", "admin12345");
 
         // Operadores
-        created += seedOperador("op1@techpark.com", "Operador 1", "op123456", "Z-01");
-    created += seedOperador("op2@techpark.com", "Operador 2", "op123456", "Z-02");
-    created += seedOperador("op3@techpark.com", "Operador 3", "op123456", "Z-03");
-    created += seedOperador("op4@techpark.com", "Operador 4", "op123456", "Z-04");
-    created += seedOperador("op5@techpark.com", "Operador 5", "op123456", "Z-05");
+    // Mínimo 2 por zona (para 5 zonas)
+    created += seedOperador("op-z01-1@techpark.com", "Operador Z01-1", "op123456", "Z-01");
+    created += seedOperador("op-z01-2@techpark.com", "Operador Z01-2", "op123456", "Z-01");
 
-    // Visitantes (>=20)
-    created += seedVisitantes(20);
+    created += seedOperador("op-z02-1@techpark.com", "Operador Z02-1", "op123456", "Z-02");
+    created += seedOperador("op-z02-2@techpark.com", "Operador Z02-2", "op123456", "Z-02");
+
+    created += seedOperador("op-z03-1@techpark.com", "Operador Z03-1", "op123456", "Z-03");
+    created += seedOperador("op-z03-2@techpark.com", "Operador Z03-2", "op123456", "Z-03");
+
+    created += seedOperador("op-z04-1@techpark.com", "Operador Z04-1", "op123456", "Z-04");
+    created += seedOperador("op-z04-2@techpark.com", "Operador Z04-2", "op123456", "Z-04");
+
+    created += seedOperador("op-z05-1@techpark.com", "Operador Z05-1", "op123456", "Z-05");
+    created += seedOperador("op-z05-2@techpark.com", "Operador Z05-2", "op123456", "Z-05");
+
+    // Visitantes (500)
+    created += seedVisitantes(500);
 
         return created;
     }
 
     private int seedVisitantes(int count) {
-        int created = 0;
+        // Crear en batch para que sea rápido.
+        // Nota: Visitante no tiene relación persistida a Atracción; lo “realista” lo reflejamos
+        // incrementando visitantesAcumulados en atracciones por zona.
         Random r = new Random(42);
 
+        List<Atraccion> atrs = atraccionRepository.findAll();
+        // Para reflejar visitantes en zonas (persistido en `Zona.visitantesActuales`).
+        Map<String, Zona> zonasById = new java.util.HashMap<>();
+        for (Zona z : zonaRepository.findAll()) {
+            // Reiniciamos y recalculamos en este seed (más consistente en dev)
+            z.setVisitantesActuales(0);
+            zonasById.put(z.getId(), z);
+        }
+        if (atrs.isEmpty()) {
+            // Si no hay atracciones aún, igual creamos visitantes.
+            atrs = List.of();
+        }
+
+        int created = 0;
+        // Guardamos en lotes para evitar 500 inserts individuales.
+        final int batchSize = 100;
+        List<Visitante> batch = new java.util.ArrayList<>(batchSize);
+
         for (int i = 1; i <= count; i++) {
-            String email = String.format("visitante%02d@techpark.com", i);
+            String email = String.format("visitante%03d@techpark.com", i);
             if (usuarioRepository.existsByEmail(email)) continue;
 
             Visitante v = new Visitante();
             v.setEmail(email);
             v.setPassword(usuarioService.encodePasswordForStorage("visitante123"));
-            v.setNombre("Visitante " + i);
+
+            String[] nombres = {"Sofia", "Mateo", "Valentina", "Sebastian", "Camila", "Daniel", "Isabella", "Juan", "Sara", "Nicolas"};
+            String[] apellidos = {"Gomez", "Rodriguez", "Martinez", "Perez", "Garcia", "Lopez", "Hernandez", "Diaz", "Sanchez", "Torres"};
+            String nombre = nombres[(i - 1) % nombres.length] + " " + apellidos[(i - 1) % apellidos.length];
+            v.setNombre(nombre);
+
             v.setDocumento("DOC" + String.format("%06d", 100000 + i));
 
             int edad = 10 + (i % 40); // 10..49
             double estatura = 1.1 + (r.nextInt(70) / 100.0); // 1.10..1.79
-            double saldo = 0.0;
 
             v.setEdad(edad);
             v.setEstatura(estatura);
-            v.setSaldoVirtual(saldo);
+            v.setSaldoVirtual(0.0);
             v.setActivo(true);
 
-            usuarioRepository.save(v);
+            batch.add(v);
             created++;
+
+            // Asignación “realista”: sumamos contadores a una atracción de la misma zona
+            // elegida de forma determinística.
+            if (!atrs.isEmpty()) {
+                Atraccion chosen = atrs.get((i - 1) % atrs.size());
+                chosen.setVisitantesAcumulados(chosen.getVisitantesAcumulados() + 1);
+
+                String zid = chosen.getZonaId();
+                if (zid != null) {
+                    Zona z = zonasById.get(zid);
+                    if (z != null) {
+                        z.setVisitantesActuales(z.getVisitantesActuales() + 1);
+                    }
+                }
+            }
+
+            if (batch.size() >= batchSize) {
+                usuarioRepository.saveAll(batch);
+                batch.clear();
+            }
+        }
+
+        if (!batch.isEmpty()) {
+            usuarioRepository.saveAll(batch);
+        }
+
+        // Persistimos cambios en acumulados (si hubo atracciones)
+        if (!atrs.isEmpty()) {
+            atraccionRepository.saveAll(atrs);
+        }
+
+        // Persistimos visitantesActuales por zona
+        if (!zonasById.isEmpty()) {
+            zonaRepository.saveAll(new java.util.ArrayList<>(zonasById.values()));
         }
 
         return created;
